@@ -2530,6 +2530,40 @@ INSERT INTO `user_ln` (`ln_id`, `hd_id`, `fname`, `mname`, `lname`, `birthday`, 
 	(26, 1007, 'Test', '', 'Test', NULL, NULL, 'Purok 7', 'Guinacot', 'Guindulman', 'Bohol', '6310', '', '', '', NULL, NULL, NULL, 1, '2025-03-28 06:20:54', '2025-03-28 06:20:54'),
 	(27, 1009, 'Test', '', '3rwersf', '', '', 'Purok 7', 'Guinacot', 'Guindulman', 'Bohol', '', '', '', '', NULL, NULL, NULL, 1, '2025-03-28 09:28:11', '2025-04-08 02:20:29');
 
+
+	CREATE TABLE IF NOT EXISTS `tbl_loan` (
+		`id` INT(10) NOT NULL AUTO_INCREMENT,
+		`member_id` INT(10) NOT NULL,
+		`loan_amt` DECIMAL(20,6) NOT NULL,
+		`status` ENUM('ongoing','completed') NOT NULL DEFAULT 'ongoing' COLLATE 'utf8mb4_0900_ai_ci',
+		`user_id` INT(10) NOT NULL,
+		`loan_date` DATE NOT NULL,
+		`return_date` DATE NOT NULL,
+		`created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		PRIMARY KEY (`id`) USING BTREE
+	)
+	COLLATE='utf8mb4_0900_ai_ci'
+	ENGINE=InnoDB
+	AUTO_INCREMENT=9
+	;
+
+	CREATE TABLE IF NOT EXISTS `tbl_interest_payment` (
+		`id` INT(10) NOT NULL AUTO_INCREMENT,
+		`loan_id` INT(10) NOT NULL,
+		`month` TINYINT(3) NOT NULL,
+		`interest_rate` ENUM('5%','10%') NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+		`interest_amt` DECIMAL(20,6) NOT NULL,
+		`payment_date` DATE NOT NULL,
+		`user_id` INT(10) NOT NULL DEFAULT '0',
+		`created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+		PRIMARY KEY (`id`) USING BTREE
+	)
+	COLLATE='utf8mb4_0900_ai_ci'
+	ENGINE=InnoDB
+	AUTO_INCREMENT=12
+	;
+
+
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
