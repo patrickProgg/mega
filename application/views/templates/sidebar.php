@@ -23,7 +23,6 @@
             <a href="<?= base_url() ?>index">
                 <i class='bx bx-group'></i>
                 <span class="text">Members</span>
-                <!-- <span class="badge bg-danger rounded-pill" style="margin-left: 40px;">0 </span> -->
             </a>
         </li>
         <li class="<?= ($this->uri->segment(1) == 'payment') ? 'active' : '' ?>">
@@ -38,8 +37,8 @@
                 <span class="text">Utility Assets</span>
             </a>
         </li>
-        <li class="<?= ($this->uri->segment(1) == 'Message') ? 'active' : '' ?>">
-            <a href="#">
+        <li class="<?= ($this->uri->segment(1) == 'loan') ? 'active' : '' ?>">
+            <a href="<?= base_url() ?>loan">
                 <i class='bx bx-wallet'></i>
                 <span class="text">Loan</span>
             </a>

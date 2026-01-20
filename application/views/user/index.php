@@ -30,31 +30,20 @@
                         <a class="active" href="#">Home</a>
                     </li> -->
                     <div>
-                        <!-- <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal" style="font-size: 14px;">
-                            <i class="fas fa-user-plus"></i> Add Member
-                        </button> -->
                         <div class="d-flex gap-2">
                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal" style="font-size: 14px;">
                                 <i class="fas fa-user-plus"></i> Add Member
                             </button>
-
-                            <!-- <button class="btn" title="Filter" style="border:none;" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-filter"></i>
-                            </button> -->
 
                             <div class="dropdown">
                                 <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButtonAddress" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Address
                                 </button>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButtonAddress" id="address-filter" style="cursor:pointer;">
-                                    <!-- <a class="dropdown-item" href="#">Default</a> -->
                                     <a class="dropdown-item">Address</a>
-                                    <!-- <a class="dropdown-header" id="addressHeader">Address</a> -->
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item" data-status="Masayag">Masayag</a>
                                     <a class="dropdown-item" data-status="East">East</a>
-                                    <!-- <a class="dropdown-item" data-status="Guinacot">Guinacot</a> -->
-                                    <!-- <a class="dropdown-item" data-status="Guindulman">Guindulman</a> -->
                                 </div>
                             </div>
 
@@ -144,8 +133,8 @@
                 <div class="modal-content">
                     <div class="modal-body" id="modal-content">
                         <div class="container">
-                            <div class="row gutters">
-                                <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
+                            <!-- <div class="row gutters"> -->
+                                <!-- <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
                                     <div class="card h-100">
                                         <div class="card-body">
                                             <div class="account-settings">
@@ -163,8 +152,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
+                                </div> -->
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row gutters">
@@ -274,7 +263,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            <!-- </div> -->
                         </div>
                     </div>
 
@@ -486,7 +475,7 @@
                 <div class="modal-content">
                     <div class="modal-body" id="modal-content">
                         <div class="container">
-                            <div class="row gutters">
+                            <!-- <div class="row gutters">
                                 <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
                                     <div class="card h-100">
                                         <div class="card-body">
@@ -495,7 +484,6 @@
                                                     <div class="user-avatar">
                                                         <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="Maxwell Admin">
                                                     </div>
-                                                    <!-- <h5 class="user-name">Yuki Hayashi</h5> -->
                                                     <h5 id="es_fname"></h5>
                                                     <h6 class="user-email">yuki@Maxwell.com</h6>
                                                 </div>
@@ -506,8 +494,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
+                                </div> -->
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row gutters">
@@ -624,7 +612,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            <!-- </div> -->
                         </div>
                     </div>
 
@@ -639,7 +627,7 @@
                 <div class="modal-content">
                     <div class="modal-body" id="modal-content">
                         <div class="container">
-                            <div class="row gutters">
+                            <!-- <div class="row gutters">
                                 <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
                                     <div class="card h-100">
                                         <div class="card-body">
@@ -648,7 +636,6 @@
                                                     <div class="user-avatar">
                                                         <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="Maxwell Admin">
                                                     </div>
-                                                    <!-- <h5 class="user-name">Yuki Hayashi</h5> -->
                                                     <h5 id="efs_fname"></h5>
                                                     <h6 class="user-email">yuki@Maxwell.com</h6>
                                                 </div>
@@ -659,8 +646,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
+                                </div> -->
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row gutters">
@@ -770,7 +757,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                <!-- </div> -->
                             </div>
                         </div>
                     </div>
@@ -882,11 +869,11 @@
                 data: 'status',
                 render: function(data, type, row) {
                     if (data == 1) {
-                        return '<span class="badge bg-success">Active</span>';
+                        return '<span class="badge bg-danger">Inactive</span>';
                     } else if (data == 2) {
                         return '<span class="badge bg-secondary">Deceased</span>';
                     } else {
-                        return '<span class="badge bg-danger">Inactive</span>';
+                        return '<span class="badge bg-success">Active</span>';
                     }
                 }
             },

@@ -106,6 +106,13 @@
                         <p>Rental Revenue</p>
                     </span>
                 </li>
+                <li>
+                    <i class='bx bxs-dollar-circle'></i>
+                    <span class="text">
+                        <h3>₱<?= number_format($total_rent_revenue, 2) ?></h3>
+                        <p>Rental Revenue</p>
+                    </span>
+                </li>
             </ul>
 
             <div class="table-data">
@@ -128,15 +135,15 @@
                             foreach ($details as $row) { ?>
                                 <tr>
                                     <td><?= $row['full_name'] ?></td>
-                                    <td><?= date('M. j, Y', strtotime($row['date_joined'])) ?></td>
+                                    <td><?=$row['date_joined']?></td>
                                     <td>
                                         <?php
                                         if ($row['status'] == 1) {
-                                            echo '<span class="badge bg-success">Active</span>';
+                                            echo '<span class="badge bg-danger">Inactive</span>';
                                         } elseif ($row['status'] == 2) {
                                             echo '<span class="badge bg-secondary">Deceased</span>';
                                         } else {
-                                            echo '<span class="badge bg-danger">Inactive</span>';
+                                            echo '<span class="badge bg-success">Active</span>';
                                         }
                                         ?>
                                     </td>
