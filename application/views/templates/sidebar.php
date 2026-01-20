@@ -39,7 +39,7 @@
             </a>
         </li>
         <li class="<?= ($this->uri->segment(1) == 'Message') ? 'active' : '' ?>">
-            <a href="#">
+            <a href="<?= base_url() ?>loan">
                 <i class='bx bx-wallet'></i>
                 <span class="text">Loan</span>
             </a>

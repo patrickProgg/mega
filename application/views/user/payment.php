@@ -691,13 +691,13 @@
         });
     });
 
-    document.getElementById("quantity").addEventListener("change", function() {
-        let amountField = document.getElementById("amount");
+    // document.getElementById("quantity").addEventListener("change", function() {
+    //     let amountField = document.getElementById("amount");
 
-        if (this.value === "partial") {
-            amountField.value = 50; // Set amount for Partial (change as needed)
-        } else if (this.value === "full") {
-            amountField.value = 100; // Set amount for Full (change as needed)
-        }
-    });
+    //     if (this.value === "partial") {
+    //         amountField.value = 50; // Set amount for Partial (change as needed)
+    //     } else if (this.value === "full") {
+    //         amountField.value = 100; // Set amount for Full (change as needed)
+    //     }
+    // });
 </script>
