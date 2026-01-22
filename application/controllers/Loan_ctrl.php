@@ -30,24 +30,6 @@ class Loan_ctrl extends CI_Controller
 		$length = $this->input->post('length');
 		$searchValue = trim($this->input->post('search')['value']);
 
-        // $this->db->select('
-        //     a.id,
-        //     a.member_id,
-        //     a.loan_amt,
-        //     a.status,
-        //     a.loan_date,
-        //     a.return_date,
-        //     CONCAT(b.fname, " ", b.lname) AS full_name,
-        //     b.province,
-        //     b.phone1
-        // ');
-
-        // $this->db->from('tbl_loan as a');
-        // $this->db->join('user_hd as b', 'b.hd_id = a.member_id', 'left');
-
-        // $this->db->order_by('a.id', 'DESC');
-        // $this->db->group_by('a.member_id');
-
         $this->db->select('
             MAX(a.id) as id,
             a.member_id,
