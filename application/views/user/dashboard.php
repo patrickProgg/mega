@@ -11,7 +11,7 @@
 
     /* class="order" style="background-color: rgba(255, 255, 255, 0.6);" */
     .box-info-li {
-        background-image: url('<?= base_url('assets/image/db.jpg'); ?>');
+        background-image: url('<?= base_url('assets/image/MEGA.jpg'); ?>');
         background-size: cover;
         background-position: center;
     }
@@ -138,9 +138,9 @@
                                      <td><?=$row['date_joined']?></td>
                                     <td>
                                         <?php
-                                        if ($row['status'] == 1) {
+                                        if ($row['status'] == 'inactive') {
                                             echo '<span class="badge bg-danger">Inactive</span>';
-                                        } elseif ($row['status'] == 2) {
+                                        } elseif ($row['status'] == 'inactive') {
                                             echo '<span class="badge bg-secondary">Deceased</span>';
                                         } else {
                                             echo '<span class="badge bg-success">Active</span>';

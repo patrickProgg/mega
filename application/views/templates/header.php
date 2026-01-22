@@ -21,7 +21,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>MEGA</title>
-	<link rel="icon" type="image/png" href="<?= base_url('assets/image/hands-heart.png'); ?>">
+	<link rel="icon" type="image/png" href="<?= base_url('assets/image/MEGA2.png'); ?>">
 </head>
 
 </html>
@@ -423,7 +423,7 @@
 
 	#content main {
 		width: 100%;
-		padding: 36px 24px;
+		padding: 8px 15px;
 		font-family: var(--poppins);
 		max-height: calc(100vh - 56px);
 		overflow-y: auto;

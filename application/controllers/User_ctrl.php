@@ -25,32 +25,111 @@ class User_ctrl extends CI_Controller
     }
 
 
-    public function getData()
+    public function getHeadData()
     {
-        if ($this->input->is_ajax_request()) {
-            $start = $this->input->post('start');
-            $length = $this->input->post('length');
-            $order = $this->input->post('order');
-            $search = $this->input->post('search');
-            $status = $this->input->post('status');
-            $address = $this->input->post('address');
+        $start = $this->input->post('start');
+        $length = $this->input->post('length');
+        $searchValue = trim($this->input->post('search')['value']);
+        $status = $this->input->post('status');
+        $address = $this->input->post('address');
 
-            // var_dump($status);
+        $this->db->select("
+            hd_id,
+            fname,
+            mname,
+            lname,
+            birthday,
+            age,
+            purok,
+            barangay,
+            city,
+            province,
+            zip_code,
+            phone1,
+            phone2,
+            status,
+            date_joined,
+            CONCAT(fname, ' ', lname) AS full_name, 
+            CONCAT_WS(', ', purok, barangay, city, province) AS address
+        ");
 
-            $column_index = isset($order[0]['column']) ? $order[0]['column'] : 0;
-            $sort_direction = isset($order[0]['dir']) ? $order[0]['dir'] : 'asc';
+        $this->db->from('user_hd');
 
-            $data = $this->User_mod->getData($start, $length, $column_index, $sort_direction, $search, $status, $address);
+        $this->db->order_by('hd_id', 'DESC');
 
-            $response = [
-
-                "draw" => intval($this->input->post('draw')),
-                "recordsTotal" => $data['total_records'],
-                "recordsFiltered" => $data['filtered_records'],
-                "data" => $data['data']
-            ];
-            echo json_encode($response);
+        if (!empty($searchValue)) {
+            $this->db->group_start();
+            $this->db->like('fname', $searchValue);
+            $this->db->or_like('lname', $searchValue);
+            $this->db->or_like("CONCAT_WS(', ', purok, barangay, city, province)",$searchValue,'both',false);
+            $this->db->or_like('phone1', $searchValue);
+            $this->db->group_end();
         }
+
+        $subQuery = clone $this->db;
+        $recordsFiltered = $subQuery->get()->num_rows();
+
+        $this->db->limit($length, $start);
+        $query = $this->db->get();
+        $data = $query->result_array();
+
+        echo json_encode([
+            "draw" => intval($this->input->post('draw')),
+            "recordsTotal" => $recordsFiltered,
+            "recordsFiltered" => $recordsFiltered,
+            "data" => $data
+        ]);
+    }
+
+    public function getHeadDetails()
+    {
+        $id = $this->input->post('id');
+
+        $this->db->select("
+            ln_id,
+            fname,
+            mname,
+            lname,
+            birthday,
+            age,
+            purok,
+            barangay,
+            city,
+            province,
+            zip_code,
+            phone1,
+            phone2,
+            status,
+            CONCAT(fname, ' ', lname) AS full_name, 
+            CONCAT_WS(', ', purok, barangay, city, province) AS address
+        ");
+
+        $this->db->from('user_ln');
+        $this->db->where('hd_id', $id);
+
+        $this->db->order_by('ln_id', 'DESC');
+
+        if (!empty($searchValue)) {
+            $this->db->group_start();
+            $this->db->like('fname', $searchValue);
+            $this->db->or_like('lname', $searchValue);
+            $this->db->or_like("CONCAT_WS(', ', purok, barangay, city, province)",$searchValue,'both',false);
+            $this->db->or_like('phone1', $searchValue);
+            $this->db->group_end();
+        }
+
+        $subQuery = clone $this->db;
+        $recordsFiltered = $subQuery->get()->num_rows();
+
+        $query = $this->db->get();
+        $data = $query->result_array();
+
+        echo json_encode([
+            "draw" => intval($this->input->post('draw')),
+            "recordsTotal" => $recordsFiltered,
+            "recordsFiltered" => $recordsFiltered,
+            "data" => $data
+        ]);
     }
 
     public function upload_csv()
@@ -112,55 +191,12 @@ class User_ctrl extends CI_Controller
         echo json_encode($user);
     }
 
-    // public function sendTo()
-    // {
-    //     if ($this->input->is_ajax_request()) {
-    //         $user_id = $this->input->post('user_id');
-
-    //         $user = $this->db->get_where('user_hd', ['hd_id' => $user_id])->row();
-    //         $users = $this->User_mod->getAllActiveUsers();
-    //         $totalUsers = $users['total_records'];
-
-    //         $total_amount = $totalUsers * 100;
-    //         // var_dump($total_amount);
-    //         // exit;
-
-    //         if ($user) {
-    //             $data = [
-    //                 'hd_id' => $user->hd_id,
-    //                 'dd_fname' => $user->fname,
-    //                 'dd_mname' => $user->mname,
-    //                 'dd_lname' => $user->lname,
-    //                 'dd_phone1' => $user->phone1,
-    //                 'dd_phone2' => $user->phone2,
-    //                 'dd_email' => $user->email,
-    //                 'dd_date_joined' => $user->date_joined,
-    //                 'dd_total_amt' =>  $total_amount,
-    //                 'dd_status' => 2
-    //             ];
-
-
-    //             $this->db->insert('deceased', $data);
-
-    //             $this->db->where('hd_id', $user_id);
-    //             $this->db->update('user_hd', ['status' => 2]);
-    //             // Optional: Delete from the original table
-    //             // $this->db->delete('users', ['id' => $user_id]);
-
-    //             echo json_encode(['status' => 'success']);
-    //         } else {
-    //             echo json_encode(['status' => 'error']);
-    //         }
-    //     }
-    // }
-
     public function sendTo()
     {
         if ($this->input->is_ajax_request()) {
             $user_id = $this->input->post('user_id');
             $date_died = $this->input->post('date_died');
 
-            // Fetch user details
             $user = $this->db->get_where('user_hd', ['hd_id' => $user_id])->row();
 
             if (!$user) {
@@ -168,17 +204,16 @@ class User_ctrl extends CI_Controller
                 return;
             }
 
-            // Fetch all active users excluding the deceased user
             $this->db->select('hd_id');
             $this->db->from('user_hd');
-            $this->db->where('hd_id !=', $user_id); // Exclude deceased user
+            $this->db->where('hd_id !=', $user_id); 
             $allUsers = $this->db->get()->result();
 
-            $totalUsers = count($allUsers); // Count of users in death_fund
+            $totalUsers = count($allUsers);
             $total_amount = $totalUsers * 100;
-            // $date_today = date('Y-m-d');
+
             $deadline = date('Y-m-d', strtotime($date_died . ' +3 days'));
-            // Insert into deceased table
+
             $data = [
                 'hd_id' => $user->hd_id,
                 'dd_date_died' => $date_died,
@@ -187,25 +222,19 @@ class User_ctrl extends CI_Controller
             ];
 
             $this->db->insert('deceased', $data);
-            $dd_id = $this->db->insert_id(); // Get last inserted dd_id
+            $dd_id = $this->db->insert_id(); 
 
-            // Update user_hd status
             $this->db->where('hd_id', $user_id);
             $this->db->update('user_hd', ['status' => 2]);
 
-            // Prepare data for insertion
-
-
-
             $insertData = [];
             foreach ($allUsers as $u) {
-                // Check if entry already exists
                 $exists = $this->db->get_where('death_fund', [
                     'dd_id' => $dd_id,
                     'hd_id' => $u->hd_id
                 ])->row();
 
-                if (!$exists) { // Only insert if not already in death_fund
+                if (!$exists) { 
                     $insertData[] = [
                         'dd_id' => $dd_id,
                         'hd_id' => $u->hd_id,
@@ -215,7 +244,6 @@ class User_ctrl extends CI_Controller
                 }
             }
 
-            // Batch insert only if there are new records
             if (!empty($insertData)) {
                 $this->db->insert_batch('death_fund', $insertData);
             }
@@ -224,75 +252,7 @@ class User_ctrl extends CI_Controller
         }
     }
 
-
-
-    public function details()
-    {
-        if ($this->input->is_ajax_request()) {
-
-            $id = $this->input->post('id');
-
-            $data = $this->User_mod->getUserMember($id);
-            $hd_id = $this->User_mod->getUserMemberId($id);
-            // $data = $this->User_mod->getUserMemberDetails($id);
-
-
-            $response = array(
-                "draw" => intval($this->input->post('draw')), // Required by DataTables
-                "recordsTotal" => count($data),
-                "recordsFiltered" => count($data),
-                "data" => $data,
-                "hd_data" => $hd_id
-            );
-
-            echo json_encode($response);
-            // var_dump($response);
-            // exit;
-        } else {
-            show_error('No direct access allowed');
-        }
-    }
-
-    public function memberDetails()
-    {
-        if ($this->input->is_ajax_request()) {
-
-            $id = $this->input->post('id');
-
-            $data = $this->User_mod->getMember($id);
-
-            $response = array(
-                "draw" => intval($this->input->post('draw')), // Required by DataTables
-                "data" => $data
-            );
-
-            echo json_encode($response);
-        } else {
-            show_error('No direct access allowed');
-        }
-    }
-
-    public function memberFamDetails()
-    {
-        if ($this->input->is_ajax_request()) {
-
-            $id = $this->input->post('id');
-
-            $data = $this->User_mod->getFamMember($id);
-
-            // var_dump($data);
-            $response = array(
-                "draw" => intval($this->input->post('draw')), // Required by DataTables
-                "data" => $data
-            );
-
-            echo json_encode($response);
-        } else {
-            show_error('No direct access allowed');
-        }
-    }
-
-    public function addMember()
+    public function addParent()
     {
         if ($this->input->is_ajax_request()) {
 
@@ -311,15 +271,10 @@ class User_ctrl extends CI_Controller
                 'city'      => $data['city'],
                 'province'      => $data['province'],
                 'zip_code'      => $data['zip_code'],
-                'email'    => $data['email'],
                 'status'    => 1,
-                'date_joined'    => $data['date'],
-                // 'city'       => $data['city'],
-                // 'state'      => $data['state'],
-                // 'zip_code'   => $data['zip_code']
+                'date_joined'    => $data['date_joined'],
             ];
 
-            // Insert into database
             $insert = $this->db->insert('user_hd', $memberData);
 
             if ($insert) {
@@ -332,33 +287,28 @@ class User_ctrl extends CI_Controller
         }
     }
 
-    public function updateMember()
+    public function updateParent($id)
     {
         if ($this->input->is_ajax_request()) {
+            
+            $data = array(
+                'fname'     => $this->input->post('fname'),
+                'mname'     => $this->input->post('mname'),
+                'lname'     => $this->input->post('lname'),
+                'birthday'  => $this->input->post('birthday'),
+                'age'       => $this->input->post('age'),
+                'phone1'    => $this->input->post('phone1'),
+                'phone2'    => $this->input->post('phone2'),
+                'purok'     => $this->input->post('purok'),
+                'barangay'  => $this->input->post('barangay'),
+                'city'      => $this->input->post('city'),
+                'province'  => $this->input->post('province'),
+                'zip_code'  => $this->input->post('zip_code'),
+                'date_joined'  => $this->input->post('date_joined')
+            );
 
-            $data = $this->input->post();
-            $id = $data['id'];
-
-            $memberData = [
-                'fname'     => $data['fname'],
-                'mname'     => $data['mname'],
-                'lname'     => $data['lname'],
-                'birthday'  => $data['birthday'],
-                'age'       => $data['age'],
-                'phone1'    => $data['phone1'],
-                'phone2'    => $data['phone2'],
-                'purok'     => $data['purok'],
-                'barangay'  => $data['barangay'],
-                'city'      => $data['city'],
-                'province'  => $data['province'],
-                'zip_code'  => $data['zip_code'],
-                'email'     => $data['email'],
-                'username'     => $data['username']
-            ];
-
-            // Correct update query with WHERE condition
             $this->db->where('hd_id', $id);
-            $update = $this->db->update('user_hd', $memberData);
+            $update = $this->db->update('user_hd', $data);
 
             if ($update) {
                 echo json_encode(['success' => true, 'message' => 'Member updated successfully']);
@@ -370,54 +320,19 @@ class User_ctrl extends CI_Controller
         }
     }
 
-    public function updateFamMember()
-    {
-        if ($this->input->is_ajax_request()) {
-
-            $data = $this->input->post();
-            $id = $data['id'];
-
-            $memberData = [
-                'fname'     => $data['fname'],
-                'mname'     => $data['mname'],
-                'lname'     => $data['lname'],
-                'birthday'  => $data['birthday'],
-                'age'       => $data['age'],
-                'phone1'    => $data['phone1'],
-                'phone2'    => $data['phone2'],
-                'purok'     => $data['purok'],
-                'barangay'  => $data['barangay'],
-                'city'      => $data['city'],
-                'province'  => $data['province'],
-                'zip_code'  => $data['zip_code'],
-                'email'     => $data['email']
-            ];
-
-            // Correct update query with WHERE condition
-            $this->db->where('ln_id', $id);
-            $update = $this->db->update('user_ln', $memberData);
-
-            if ($update) {
-                echo json_encode(['success' => true, 'message' => 'Member updated successfully']);
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Database update failed']);
-            }
-        } else {
-            show_error('No direct access allowed');
-        }
-    }
-
-    public function addFamMember()
+    public function addMember($id)
     {
         if ($this->input->is_ajax_request()) {
 
             $data = $this->input->post();
 
             $memberData = [
-                'hd_id' => $data['id'],
+                'hd_id' => $id,
                 'fname' => $data['fname'],
                 'mname' => $data['mname'],
                 'lname'  => $data['lname'],
+                'birthday'   => $data['birthday'],
+                'age'        => $data['age'],
                 'phone1'     => $data['phone1'],
                 'phone2'     => $data['phone2'],
                 'purok'      => $data['purok'],
@@ -425,14 +340,10 @@ class User_ctrl extends CI_Controller
                 'city'      => $data['city'],
                 'province'      => $data['province'],
                 'zip_code'      => $data['zip_code'],
-                'email'    => $data['email'],
                 'status'    => 1,
-                // 'city'       => $data['city'],
-                // 'state'      => $data['state'],
-                // 'zip_code'   => $data['zip_code']
+                'date_joined'    => $data['date_joined'],
             ];
 
-            // Insert into database
             $insert = $this->db->insert('user_ln', $memberData);
 
             if ($insert) {
@@ -444,4 +355,38 @@ class User_ctrl extends CI_Controller
             show_error('No direct access allowed');
         }
     }
+
+    public function updateMember($id)
+    {
+        if ($this->input->is_ajax_request()) {
+            
+            $data = array(
+                'fname'     => $this->input->post('fname'),
+                'mname'     => $this->input->post('mname'),
+                'lname'     => $this->input->post('lname'),
+                'birthday'  => $this->input->post('birthday'),
+                'age'       => $this->input->post('age'),
+                'phone1'    => $this->input->post('phone1'),
+                'phone2'    => $this->input->post('phone2'),
+                'purok'     => $this->input->post('purok'),
+                'barangay'  => $this->input->post('barangay'),
+                'city'      => $this->input->post('city'),
+                'province'  => $this->input->post('province'),
+                'zip_code'  => $this->input->post('zip_code'),
+                'date_joined'  => $this->input->post('date_joined')
+            );
+
+            $this->db->where('ln_id', $id);
+            $update = $this->db->update('user_ln', $data);
+
+            if ($update) {
+                echo json_encode(['success' => true, 'message' => 'Member updated successfully']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Database update failed']);
+            }
+        } else {
+            show_error('No direct access allowed');
+        }
+    }
+
 }

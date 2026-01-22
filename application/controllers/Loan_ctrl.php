@@ -28,22 +28,47 @@ class Loan_ctrl extends CI_Controller
     {
         $start = $this->input->post('start');
 		$length = $this->input->post('length');
-		$searchValue = $this->input->post('search')['value'];
+		$searchValue = trim($this->input->post('search')['value']);
+
+        // $this->db->select('
+        //     a.id,
+        //     a.member_id,
+        //     a.loan_amt,
+        //     a.status,
+        //     a.loan_date,
+        //     a.return_date,
+        //     CONCAT(b.fname, " ", b.lname) AS full_name,
+        //     b.province,
+        //     b.phone1
+        // ');
+
+        // $this->db->from('tbl_loan as a');
+        // $this->db->join('user_hd as b', 'b.hd_id = a.member_id', 'left');
+
+        // $this->db->order_by('a.id', 'DESC');
+        // $this->db->group_by('a.member_id');
 
         $this->db->select('
-            a.id,
-            a.loan_amt,
-            a.status,
-            a.loan_date,
-            a.return_date,
+            MAX(a.id) as id,
+            a.member_id,
+            MAX(a.status) as status,
+            MAX(a.loan_date) as loan_date,
+            MAX(a.return_date) as return_date,
             CONCAT(b.fname, " ", b.lname) AS full_name,
+            GROUP_CONCAT(a.id ORDER BY a.loan_date SEPARATOR ",") AS loan_ids,
+            GROUP_CONCAT(a.loan_date ORDER BY a.loan_date SEPARATOR ",") AS loan_dates,
+            GROUP_CONCAT(a.loan_amt ORDER BY a.loan_date SEPARATOR ",") AS loan_amts,
+            GROUP_CONCAT(a.status ORDER BY a.loan_date SEPARATOR ",") AS statuses,
+            GROUP_CONCAT(a.return_date ORDER BY a.loan_date SEPARATOR ",") AS return_dates,
             b.province,
             b.phone1
         ');
 
         $this->db->from('tbl_loan as a');
         $this->db->join('user_hd as b', 'b.hd_id = a.member_id', 'left');
-        $this->db->group_by('a.id');
+        
+        $this->db->group_by('a.member_id');
+        $this->db->order_by('id', 'DESC');
 
         if (!empty($searchValue)) {
 			$this->db->group_start();
@@ -100,14 +125,16 @@ class Loan_ctrl extends CI_Controller
         $id = $this->input->post('id');
 
          $this->db->select('
-            id,
-            month,
-            interest_rate,
-            interest_amt,
-            payment_date
+            a.id,
+            a.month,
+            a.interest_rate,
+            a.interest_amt,
+            a.payment_date,
         ');
-        $this->db->from('tbl_interest_payment');
-        $this->db->where('loan_id', $id);
+        $this->db->from('tbl_interest_payment as a');
+        $this->db->join('tbl_loan as b', 'b.id = a.loan_id', 'left');
+
+        $this->db->where('a.loan_id', $id);
 
         $query = $this->db->get();
 		$data = $query->result_array();

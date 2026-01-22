@@ -21,23 +21,20 @@ class Login_ctrl extends CI_Controller
 
     public function authenticate()
     {
-        $username_or_email = $this->input->post('username_or_email');
+        $username = $this->input->post('username');
         $password = $this->input->post('password');
 
-        $user = $this->Login_mod->authenticate($username_or_email, $password);
+        $user = $this->Login_mod->authenticate($username, $password);
 
         if ($user) {
-
             $this->session->set_userdata('logged_in', TRUE);
             $this->session->set_userdata('user_id', $user->id);
             $this->session->set_userdata('username', $user->username);
+            $this->session->set_userdata('usertpe', $user->user_type);
 
-            // Set flashdata for greeting message
-            $this->session->set_flashdata('login_success', $user->username . '!');
-            redirect('dashboard');
+            echo json_encode(['success' => true, 'redirect' => site_url('dashboard')]);
         } else {
-            $this->session->set_flashdata('error', 'Invalid username/email or password.');
-            redirect('login');
+            echo json_encode(['success' => false, 'message' => 'Invalid username/email or password.']);
         }
     }
 

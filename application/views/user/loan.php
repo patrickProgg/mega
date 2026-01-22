@@ -7,7 +7,7 @@
                     <div>
                         <div class="d-flex gap-2">
                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addLoaner" style="font-size: 14px;">
-                                <i class="fas fa-user-plus"></i> Create
+                                <i class="fas fa-user-plus"></i> Add New
                             </button>
                         </div>
                     </div>
@@ -82,8 +82,9 @@
                             <th>FULL NAME</th>
                             <th>ADDRESS</th>
                             <th>PHONE</th>
+                            <th>DATE</th>
                             <th>STATUS</th>
-                            <th>ACTION</th>
+                            <th style="width:100px;">ACTION</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -93,14 +94,22 @@
             </div>
         </div>
 
-        <div class="modal fade" id="payMoneyModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal fade" id="showLoanModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog" style="max-width: 1000px; overflow:hidden;">
                 <div class="table-data">
                     <div class="order">
                         <div class="modal-content" style="border:none; background: var(--light);">
 
-                            <div class="modal-header d-flex justify-content-between w-100">
-                                <div>
+                            <div class="modal-header d-flex justify-content-between w-100 col-12">
+                                <div class="col-2">
+                                    <div>
+                                        <label class="form-label">Select Date :</label>
+                                        <select id="header_date_arr" class="form-select form-select-sm">
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="ml-6">
                                     <div>
                                         <label class="form-label">Name : <span id="header_name" style="font-weight: bold;"></span> </label>
                                         <input type="hidden" id="header_id">
@@ -110,7 +119,7 @@
                                     </div>
                                 </div>
 
-                                <div>
+                                <div class="col-4">
                                     <div>
                                         <label class="form-label">
                                             Loan Date : <span id="header_date" style="font-weight: bold;"></span>
@@ -129,11 +138,11 @@
                                     <table class="table table-bordered text-center align-middle">
                                         <thead class="table-light">
                                             <tr>
-                                                <th style="text-align: center;">MONTH</th>
-                                                <th style="text-align: center;">INTEREST RATE (%)</th>
-                                                <th style="text-align: center;">INTEREST AMOUNT (₱)</th>
-                                                <th style="text-align: center;">PAYMENT DATE</th>
-                                                <th style="text-align: center;">ACTION</th>
+                                                <th style="text-align: center; padding:6px 8px;">MONTH</th>
+                                                <th style="text-align: center; padding:6px 8px;">INTEREST RATE (%)</th>
+                                                <th style="text-align: center; padding:6px 8px;">INTEREST AMOUNT (₱)</th>
+                                                <th style="text-align: center; padding:6px 8px;">PAYMENT DATE</th>
+                                                <th style="text-align: center; padding:6px 8px;">ACTION</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -188,12 +197,18 @@
                 data: 'phone1'
             },
             {
+                data: 'loan_date',
+                render: function(data, type, row) {
+                    return formatDate(data);
+                }
+            },
+            {
                 data: 'status',
                 render: function(data, type, row) {
                     if (data === 'completed') {
                         return '<span class="badge bg-success">Completed</span>';
                     } else {
-                       return '<span class="badge bg-primary">Ongoing</span>';
+                       return '<span class="badge bg-warning">Ongoing</span>';
                     }
                 }
             },
@@ -205,17 +220,17 @@
                             ${row.r_status != 1 ? `
                                 <button class="btn btn-primary btn-sm" 
                                         style="padding: 2px 6px; font-size: 12px;" 
-                                        onclick="viewLoanDetails('${data}', '${row.full_name}', '${row.loan_amt}', '${row.loan_date}', '${row.status}', '${row.return_date}')">
+                                        onclick="viewLoanDetails('${row.loan_ids}', '${row.full_name}','${row.statuses}' ,'${row.loan_dates}', '${row.loan_amts}', '${row.return_dates}')">
                                     <i class="fas fa-eye" style="font-size: 12px;"></i> View
                                 </button>
                             ` : ''}
                         </div>
                     `;
-                }
+                }               
             }
         ]
     });
-
+  
     $(document).on('click', '#saveLoaner', function() {
         let Name = $('#iName').val().trim();
         let Id = $('#hdId').val().trim();
@@ -281,129 +296,208 @@
         });
     });
 
+    function viewLoanDetails(id, fullname, status, loan_date, loan_amt, return_date) {
 
-    function viewLoanDetails(id, fname, loan_amount, loan_date, status, return_date = null) {
-       console.log('loaner id',id);
-       console.log(fname);
-       console.log(loan_date);
-       console.log(return_date);
-       const amount = Number(loan_amount).toLocaleString('en-PH', {
+        const amount = Number(loan_amt).toLocaleString('en-PH', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+
+        const dates = loan_date.split(', ');
+        const ids = id.split(',');
+        const amts = loan_amt.split(',');
+        const statuses = status.split(',');
+        const return_dates = return_date.split(',');
+
+        $('#header_date_arr').empty();
+
+        dates.forEach((date, index) => {
+            const isLast = index === dates.length - 1;
+
+            $('#header_date_arr').append(`
+                <option value="${date}" data-id="${ids[index]}" data-amt="${amts[index]}" data-status="${statuses[index]}" data-return_date="${return_dates[index]}" ${isLast ? 'selected' : ''}>
+                    ${formatDate(date)}
+                </option>
+            `);
+        });
+
+        const selected = $('#header_date_arr option:selected');
+        const selectedId = selected.data('id');
+        const selectedAmt = selected.data('amt');
+        const selectedStatus = selected.data('status').trim();
+        const selectedReturn = selected.data('return_date');
+
+        const selectedDate = selected.val();
+
+        const isValidDate = (dateStr) => {
+            const date = new Date(dateStr);
+            return date instanceof Date && !isNaN(date) && dateStr !== "0000-00-00";
+        };
+
+        $('#header_name').text(fullname);
+
+        $('#header_amount').text(Number(selectedAmt).toLocaleString('en-PH', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }));
+
+        $('#header_date').text(formatDate(selectedDate));
+        $('#header_status').text(selectedStatus);
+        $('#header_date_return').text(
+            isValidDate(selectedReturn) ? formatDate(selectedReturn) : ''
+        );
+
+        $('#header_id').val(selectedId);
+
+        populateLoanTable(selectedId, selectedDate, selectedAmt, selectedStatus, selectedReturn);
+
+        $('#header_date_arr').off('change').on('change', function () {
+            const selected = $(this).find(':selected');
+            const selectedId = selected.data('id');
+            const selectedAmt = selected.data('amt');
+            const selectedStatus = selected.data('status').trim();
+            const selectedReturn = selected.data('return_date');
+            const selectedDate = selected.val();
+
+            const isValidDate = (dateStr) => {
+                const date = new Date(dateStr);
+                return date instanceof Date && !isNaN(date) && dateStr !== "0000-00-00";
+            };
+
+            $('#header_amount').text(Number(selectedAmt).toLocaleString('en-PH', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
-            });
+            }));
 
-       $('#header_name').text(fname);
-       $('#header_amount').text(amount);
-       $('#header_date').text(loan_date);
-       $('#header_date_return').text(return_date);
-       $('#header_id').val(id);
+            $('#header_date').text(formatDate(selectedDate));
+            $('#header_status').text(selectedStatus);
+            $('#header_date_return').text(
+                isValidDate(selectedReturn) ? formatDate(selectedReturn) : ''
+            );
+            $('#header_id').val(selectedId);
 
+            populateLoanTable(selectedId, selectedDate, selectedAmt, selectedStatus, selectedReturn);
+        });
+
+        $('#showLoanModal').modal('show');
+    }
+
+    function populateLoanTable(id, selectedDate, selectedAmt, selectedStatus, selectedReturn) {
 
         $.ajax({
             url: "<?php echo base_url('Loan_ctrl/get_loan_details'); ?>",
             type: "POST",
-            data: {
-                id: id
-            },
-            success: function(response) {
+            dataType: "json",
+            data: { id: id },
+            success: function (response) {
 
-            console.log(id);
-                const data = JSON.parse(response);
-                populateLoanTable(loan_date, data, id, amount, status, return_date); 
+                const loanDetails = Array.isArray(response) ? response : [];
+                const tableBody = $('#showLoanModal table tbody');
+                tableBody.empty();
 
+                let status = selectedStatus;
+                let amount = selectedAmt;
+                let return_date = selectedReturn;
+
+                let startMonth = new Date(selectedDate);
+                startMonth.setMonth(startMonth.getMonth() + 1);
+                startMonth = startMonth.getMonth();
+
+                const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                let totalInterest = 0;
+
+                let endMonth = 11;
+                if (status === "completed" && return_date && return_date !== "0000-00-00") {
+                    const tempMonth = new Date(return_date).getMonth();
+                    if (!isNaN(tempMonth)) endMonth = tempMonth;
+                } else if (return_date && return_date !== "0000-00-00") {
+                    const tempMonth = new Date(return_date).getMonth();
+                    if (!isNaN(tempMonth)) endMonth = tempMonth;
+                }
+
+                for (let m = startMonth; m <= endMonth; m++) {
+
+                    const loan = loanDetails.find(l => parseInt(l.month) === (m + 1));
+
+                    const interestRate = loan?.interest_rate ?? '-';
+                    const interestAmtValue = loan ? parseFloat(loan.interest_amt) : 0;
+                    const interestAmt = loan
+                        ? interestAmtValue.toLocaleString('en-PH', { minimumFractionDigits: 2 })
+                        : '-';
+
+                    const paymentDate = loan?.payment_date ?? '';
+
+                    let action;
+
+                    if (loan) {
+                        action = `
+                            <span class="text-success fw-bold" style="font-size:12px;">
+                                <i class="fa fa-check-circle"></i> Paid
+                            </span>`;
+                    } else {
+                        action = `
+                            <button class="btn btn-primary btn-sm pay-btn"
+                                data-month="${m + 1}"
+                                data-id="${id}"
+                                data-amount="${amount}"
+                                style="padding:4px 8px;font-size:10px;">
+                                <i class="fa fa-credit-card me-1"></i> Pay
+                            </button>`;
+                    }
+
+                    totalInterest += interestAmtValue;
+
+                    tableBody.append(`
+                    <tr>
+                        <td style="padding: 5px 6px;">${monthNames[m]}</td>
+                        <td style="padding: 5px 6px;">${interestRate}</td>
+                        <td style="padding: 5px 6px;">${interestAmt}</td>
+                        <td style="padding: 5px 6px;">${formatDate(paymentDate) || '-'}</td>
+                        <td style="padding: 5px 6px;">${action}</td>
+                    </tr>
+                    `);
+                }
+
+                tableBody.append(`
+                    <tr style="font-weight:bold;background-color:#f8f9fa;">
+                        <td colspan="2" class="text-end">Total Interest:</td>
+                        <td class="text-center">
+                            ₱${totalInterest.toLocaleString('en-PH', { minimumFractionDigits: 2 })}
+                        </td>
+                        <td colspan="2"></td>
+                    </tr>
+                `);
+
+                const returnBtn = $('#returnBtn');
+
+                if (loanDetails.length <= 0 || status ==="completed") {
+                    returnBtn.hide();
+                } else {
+                    returnBtn.show();
+                }
             },
             error: function() {
                 Swal.fire('Error', 'Something went wrong.', 'error');
             }
         });
-
-        $('#payMoneyModal').modal('show');
-    }
-
-    function populateLoanTable(startDate, loanDetails, id, amount, status, return_date = null) {
-        console.log('populateLoanTable', return_date);
-        const tableBody = $('#payMoneyModal table tbody');
-        tableBody.empty();
-
-        const startMonth = new Date(startDate).getMonth();
-        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        let totalInterest = 0;
-
-        let endMonth = 11; 
-
-        if (return_date && return_date !== "0000-00-00") {
-            const tempMonth = new Date(return_date).getMonth();
-            if (!isNaN(tempMonth)) {
-                endMonth = tempMonth;
-            }
-        }
-
-        for (let m = startMonth; m <= endMonth; m++) {
-            const loan = loanDetails.find(l => parseInt(l.month) === (m + 1)); 
-
-            const interestRate = loan ? loan.interest_rate : '';
-            const interestAmtValue = loan ? parseFloat(loan.interest_amt) : 0;
-            const interestAmt = loan ? interestAmtValue.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '';
-            const paymentDate = loan ? loan.payment_date : '';
-            const action = (loan || status === "completed")
-                ? '<span class="text-success fw-bold">Paid</span>' 
-                : `<button class="btn btn-primary btn-sm pay-btn" data-month="${m+1}" data-id="${id}" data-amount="${amount}" style="padding: 4px 8px; font-size: 10px;">Pay</button>`;
-
-            totalInterest += interestAmtValue;
-
-            const row = `
-                <tr>
-                    <td style="padding:4px 8px; vertical-align: middle;">${monthNames[m]}</td>
-                    <td style="padding:4px 8px; vertical-align: middle;">${interestRate || '-'}</td>
-                    <td style="padding:4px 8px; vertical-align: middle;">${interestAmt || '-'}</td>
-                    <td style="padding:4px 8px; vertical-align: middle;">${paymentDate || '-'}</td>
-                    <td style="padding:4px 8px; vertical-align: middle;">${action}</td>
-                </tr>
-            `;
-
-            tableBody.append(row);
-        }
-
-        const totalRow = `
-            <tr style="font-weight:bold; background-color:#f8f9fa;">
-                <td colspan="2" style="padding:4px 8px; text-align:right;">Total Interest:</td>
-                <td style="padding:4px 8px; text-align:center;">₱${totalInterest.toLocaleString('en-PH', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                <td colspan="2"></td>
-            </tr>
-        `;
-
-        tableBody.append(totalRow);
-
-        const returnBtn = $('#returnBtn'); 
-
-        if (loanDetails.length > 0 && status !== "completed") {
-            returnBtn.show();
-        } else {
-            returnBtn.hide(); 
-        }
-
-        const returnDateDiv = $('#header_date_return').closest('div');
-
-        if (status === "completed") {
-            returnDateDiv.show();
-        } else {
-            returnDateDiv.hide();
-        }
-
     }
 
     $(document).on('click', '.pay-btn', function() {
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         const month = $(this).data('month'); 
         const id = $(this).data('id');
-        const amount = Number($(this).data('amount').replace(/,/g, ''));
+        const amount = $(this).data('amount');
+
+        const defaultDate = new Date(new Date().getFullYear(), 0);
+        defaultDate.setMonth(month);
+        defaultDate.setDate(1);
 
         Swal.fire({
             title: 'Confirm Payment',
             html: `
                 <p>Month: <b>${monthNames[month-1]}</b></p>
                 <label for="paymentDate">Select Payment Date:</label>
-                <input type="date" id="paymentDate" class="swal2-input" value="${new Date().toISOString().split('T')[0]}">
+                <input type="date" id="paymentDate" class="swal2-input" value="${defaultDate.toISOString().split('T')[0]}">
             `,
             icon: 'question',
             showCancelButton: true,
@@ -440,7 +534,7 @@
 
                         const row = $(`.pay-btn[data-id="${id}"][data-month="${month}"]`).closest('tr');
 
-                        row.find('td:last').html('<span class="text-success fw-bold">Paid</span>');
+                        row.find('td:last').html('<span class="text-success fw-bold" style="font-size:12px;"><i class="fa fa-check-circle me-1"></i>Paid</span>');
                         row.find('td:nth-child(4)').text(selectedDate);
                         row.find('td:nth-child(2)').text((interestRate*100) + '%');
                         row.find('td:nth-child(3)').text(interestAmount.toLocaleString('en-PH', {minimumFractionDigits:2, maximumFractionDigits:2}));
@@ -460,6 +554,8 @@
         const id = $('#header_id').val();
         const amount = $('#header_amount').text();
 
+        console.log(id);
+
         Swal.fire({
             title: 'Confirm Return',
             text: 'Are you sure you want to return the ₱' + amount + ' principal amount?',
@@ -477,7 +573,7 @@
                     },
                     success: function(response) {
                         Swal.fire('Returned!', response.message, 'success');
-                        $('#payMoneyModal').modal('hide');
+                        $('#showLoanModal').modal('hide');
                         $('#loaner-table').DataTable().ajax.reload(); 
                     },
                     error: function() {
@@ -488,7 +584,6 @@
         });
 
     });
-
 
     $(document).ready(function() {
         let allUsers = []; 
@@ -556,4 +651,15 @@
         value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         e.target.value = value;
     });
+
+    function formatDate(dateString) {
+        if (!dateString) return ''; // Handle empty/null values
+        let date = new Date(dateString);
+        let options = {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        };
+        return date.toLocaleDateString('en-US', options);
+    }
 </script>

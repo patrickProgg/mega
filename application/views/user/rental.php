@@ -138,7 +138,7 @@
         <div class="head-title">
             <div class="left">
                 <h1>Utility Assets</h1>
-                <ul class="breadcrumb">
+                <ul class="breadcrumb mb-1">
                     <li><a href="#" class="tab-link active" data-tab="assets">Assets</a></li>
                     <li>|</li>
                     <li><a href="#" class="tab-link" data-tab="renter">Rental Transactions</a></li>
@@ -162,21 +162,18 @@
                     <table id="assets-table" class="table table-hover" style="width:100%">
                         <thead>
                             <tr>
-                                <!-- <th>ASSET CODE</th> -->
                                 <th>ASSETS</th>
                                 <th>QTY</th>
                                 <th>VACANT<br>QTY</th>
                                 <th>DAMAGED</th>
-                                <!-- <th>AMOUNT /<br>MEMBER AMT.</th> -->
                                 <th>REGULAR / MEMBER<br>RATE</th>
                                 <th>PENALTY<br>RATE</th>
                                 <th>DATE PURCHASED</th>
                                 <th>STATUS</th>
-                                <th style="width:50px;">ACTION</th>
+                                <th style="width:60px;">ACTION</th>
                             </tr>
                         </thead>
                         <tbody>
-
                         </tbody>
                     </table>
                 </div>
@@ -201,8 +198,6 @@
                                 <th>DATE RENTED</th>
                                 <th>DUE DATE</th>
                                 <th>DATE RETURNED</th>
-                                <!-- <th>PENALTY</th>
-                                <th>TOTAL AMT</th> -->
                                 <th>STATUS</th>
                                 <th style="width:50px;">ACTION</th>
                             </tr>
@@ -231,13 +226,12 @@
                                 <th>DATE ISSUED</th>
                                 <th>DUE DATE</th>
                                 <th>DATE RETURNED</th>
-                                <!-- <th>PENALTY</th>
-                                <th>TOTAL AMT</th> -->
                                 <th>STATUS</th>
                                 <th style="width:50px;">ACTION</th>
                             </tr>
                         </thead>
                         <tbody>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -591,7 +585,7 @@
                                 <div>
                                     <div id="rentPeriod" style="font-family: Arial; font-size: 16px; padding-bottom: 10px; text-align: left;"></div>
                                     <div id="penaltyAmount" style="font-family: Arial; font-size: 16px; text-align: left; padding-bottom: 10px;"></div>
-                                    <div id="computation" style="font-family: Arial; font-size: 16px;  text-align: left;"></div>
+                                    <!-- <div id="computation" style="font-family: Arial; font-size: 16px;  text-align: left;"></div> -->
                                 </div>
                             </div>
                             <div class="modal-body">
@@ -791,12 +785,19 @@
             {
                 data: 'id',
                 render: function(data, type, row) {
-                    return `<div style="display: flex; justify-content: center; align-items: center; margin-right:4px;">      
-                                <!-- Edit Icon -->
-                                <i class="fas fa-edit edit-icon text-primary" style="cursor: pointer; font-size: 14px;" 
-                                    onclick="editAsset('${row.id}')"></i>                    
-                            </div>`;
+                    return `
+                        <div style="text-center">
+                            ${row.r_status != 1 ? `
+                                <button class="btn btn-primary btn-sm" 
+                                        style="padding: 2px 6px; font-size: 12px;" 
+                                        onclick="editAsset('${data}')">
+                                    <i class="fas fa-edit edit-icon" style="font-size: 12px;"></i> Edit
+                                </button>
+                            ` : ''}
+                        </div>
+                    `;
                 }
+                
             }
         ]
     });

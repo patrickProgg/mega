@@ -8,7 +8,8 @@
 </style>
 <section id="sidebar" class="preload">
     <a href="<?= base_url() ?>dashboard" class="brand">
-        <i class='bx bx-command'></i>
+        <img src="<?= base_url(); ?>assets/image/MEGA2.png" style="width: 40px;" />
+        <!-- <i class='bx bx-command'></i> --> 
         <span class="text mega-text">MEGA</span>
     </a>
 
@@ -38,7 +39,7 @@
                 <span class="text">Utility Assets</span>
             </a>
         </li>
-        <li class="<?= ($this->uri->segment(1) == 'Message') ? 'active' : '' ?>">
+        <li class="<?= ($this->uri->segment(1) == 'loan') ? 'active' : '' ?>">
             <a href="<?= base_url() ?>loan">
                 <i class='bx bx-wallet'></i>
                 <span class="text">Loan</span>

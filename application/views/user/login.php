@@ -1,81 +1,168 @@
+
+    <link href="<?= base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="<?= base_url(); ?>assets/css/icons.min.css" rel="stylesheet">
+
+
+<style>
+
+        .login-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .glass-card {
+            width: 400px;
+            padding: 35px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+            text-align: center;
+            transform: scale(0.8);
+            transform-origin: center;
+        }
+
+        .login-title {
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+
+        /* INPUT BOX */
+        .form-control {
+            height: 48px;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            transition: 0.3s;
+        }
+
+        .form-control:focus {
+            border: 2px solid var(--bs-primary);
+            var(--bs-primary);
+            box-shadow: 0 0 12px rgba(5, 93, 226, 0.6);
+        }
+
+        .form-label {
+            color: black;
+            font-weight: 500;
+        }
+
+        .btn-login {
+            height: 48px;
+            border-radius: 10px;
+           background-color: var(--bs-primary);
+
+            border: none;
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+            transition: 0.3s ease;
+        }
+
+        .btn-login:hover {
+            background-color: var(--bs-primary);
+            box-shadow: 0 0 12px rgba(5, 93, 226, 0.6);
+        }
+
+        .small-links a {
+            color: black;
+            font-size: 14px;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .small-links a:hover {
+            color: var(--bs-primary);
+        }
+
+        .small-links {
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .footer-text {
+            color: white;
+            font-size: 13px;
+            margin-top: 30px;
+            text-align: center;
+        }
+</style>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>MEGA</title>
+	<link rel="icon" type="image/png" href="<?= base_url('assets/image/MEGA2.png'); ?>">
+</head>
+
 <div class="container">
-    <div class="screen">
-        <div class="screen__content">
-            <form id="loginForm" class="login" action="<?= base_url('authenticate') ?>" method="POST">
-                <div class="login__field">
-                    <i class="login__icon fas fa-user"></i>
-                    <input type="text" name="username_or_email" class="login__input" placeholder="User name / Email" required>
+    <div class="login-container">
+        <div class="glass-card">
+
+            <img src="<?= base_url(); ?>assets/image/MEGA2.png" style="width: 160px; margin-bottom: 15px;" />
+
+            <div class="mb-3 text-start">
+                <label class="form-label text-white">Username</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Enter username">
+            </div>
+
+            <div class="mb-3 text-start">
+                <label class="form-label text-white">Password</label>
+                <div class="input-group">
+                    <input type="password" id="password" name="password" class="form-control"
+                        placeholder="Enter password">
+                    <!-- <button type="button" class="btn btn-light" onclick="togglePassword()">
+                        <i class="mdi mdi-eye-outline"></i>
+                    </button> -->
                 </div>
-                <div class="login__field">
-                    <i class="login__icon fas fa-lock"></i>
-                    <input type="password" name="password" class="login__input" placeholder="Password" required>
-                </div>
-                <button type="submit" id="loginButton" class="button login__submit">
-                    <span class="button__text">Log In Now</span>
-                    <i class="button__icon fas fa-chevron-right"></i>
-                </button>
-            </form>
-            <!-- <div class="social-login">
-                <h3>log in via</h3>
-                <div class="social-icons">
-                    <a href="#" class="social-login__icon fab fa-instagram"></a>
-                    <a href="#" class="social-login__icon fab fa-facebook"></a>
-                    <a href="#" class="social-login__icon fab fa-twitter"></a>
-                </div>
-            </div> -->
+            </div>
+
+            <button class="btn btn-login w-100" id="submit">Log In</button>
+
+            <div class="small-links">
+                <a href="#">Forgot Password?</a>
+                <a href="#">Create Account</a>
+            </div>
         </div>
-        <div class="screen__background">
-            <span class="screen__background__shape screen__background__shape4"></span>
-            <span class="screen__background__shape screen__background__shape3"></span>
-            <span class="screen__background__shape screen__background__shape2"></span>
-            <span class="screen__background__shape screen__background__shape1"></span>
+        <div class="footer-text">
+            ©
+            <script>document.write(new Date().getFullYear())</script> WMS URC.
         </div>
     </div>
-
-    <?php if ($this->session->flashdata('error')) { ?>
-        <div class="custom-alert alert alert-danger position-absolute top-0 end-0 m-3" role="alert">
-            Invalid username/email or password.
-        </div>
-    <?php } ?>
-    <?php if ($this->session->flashdata('success')) { ?>
-        <div class="custom-alert alert alert-success" role="alert">
-            Successfully Added
-        </div>
-    <?php } ?>
-    <?php if ($this->session->flashdata('deleted')) { ?>
-        <div class="custom-alert alert alert-success" role="alert">
-            Successfully Deleted
-        </div>
-    <?php } ?>
-    <?php if ($this->session->flashdata('error')) { ?>
-        <div class="custom-alert alert alert-danger" role="alert">
-            Failed!
-        </div>
-    <?php } ?>
 </div>
 
-<!-- Add SweetAlert script -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
+<script src="<?php echo base_url(); ?>assets/js/jquery-3.6.0.min.js"></script>
 <script>
-    const loginForm = document.getElementById('loginForm');
+    $(function () {
+        $("#submit").on('click', function () {
+            let username = $("#username").val();
+            let password = $("#password").val();
+   
+            $.ajax({
+                type: "POST",
+                url: "<?= site_url('Login_ctrl/authenticate'); ?>",
+                data: { username: username, password: password },
+                dataType: "json",
+                success: function (response) {
+                    if (response.success) {
+                        window.location.href = response.redirect;
+                    } else {
+                        Swal.fire("Error", response.message, "error");
+                    }
+                }
 
-    loginForm.addEventListener('submit', function (event) {
-        event.preventDefault(); // Prevent immediate form submission
-
-        // Swal.fire({
-        //     title: 'Logging in...',
-        //     text: 'Please wait while we verify your credentials.',
-        //     icon: 'info',
-        //     allowOutsideClick: false,
-        //     showConfirmButton: false,
-        //     didOpen: () => {
-        //         Swal.showLoading(); // Show the loading spinner
-        //     }
-        // });
-
-        // Simulate form submission with a short delay to show the loading
-        // setTimeout(() => {
-            loginForm.submit(); // Submit the form after the delay
-        // }, 500); // Adjust delay if needed
+            });
+        });
+        $(document).on("keydown", function (e) {
+            if (e.key === "Enter") {
+                $("#submit").click();
+            }
+        });
     });
 </script>
