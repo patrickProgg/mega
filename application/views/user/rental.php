@@ -153,8 +153,8 @@
         <!-- Tab Content Sections -->
         <div id="assets" class="tab-content active">
             <div>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAssetsModal">
-                    <i class="fas fa-box"></i> Add Asset
+                <button class="btn btn-primary" onclick="openModal('addAsset')" style="font-size: 14px;">
+                    <i class="fas fa-user-plus"></i> Add Renter
                 </button>
             </div>
             <div class="table-data">
@@ -237,8 +237,7 @@
             </div>
         </div>
 
-        <!-- add assets modal -->
-        <div class="modal fade" id="addAssetsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="1" aria-hidden="true">
+        <div class="modal fade" id="addModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="1" aria-hidden="true">
             <div class="modal-dialog" style="max-width: 800px; overflow:hidden;">
                 <div class="table-data">
                     <div class="order">
@@ -248,10 +247,11 @@
                                     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-2">
                                         <h5 class="mb-2 text-primary">Asset Details</h5>
                                     </div>
+                                    <input type="hidden" class="form-control" id="asset_id">
                                     <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mb-2">
                                         <div class="form-group">
                                             <label for="Asset Name">Asset Name</label>
-                                            <input type="text" class="form-control" id="assName" placeholder="Enter Asset Name" oninput="capitalizeName(this)">
+                                            <input type="text" class="form-control" id="asset_name" placeholder="Enter Asset Name" oninput="capitalizeName(this)">
                                         </div>
                                     </div>
                                     <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 ">
@@ -261,51 +261,48 @@
                                         </div>
                                     </div>
                                     <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mb-2">
-                                        <!-- <div class="form-group">
-                                            <label for="Rental Period">Rental Period (day/s)</label>
-                                            <input type="text" class="form-control" id="rentPerd" placeholder="Enter Rental Period" oninput="capitalizeName(this)">
-                                        </div> -->
                                         <div class="form-group" style="position: relative;">
                                             <label for="Rental Period">Rental Period</label>
-                                            <input type="text" class="form-control" id="rentPerd" placeholder="0" style="padding-right: 50px;">
+                                            <input type="text" class="form-control" id="period" placeholder="0" style="padding-right: 50px;">
                                             <span style="position: absolute; right: 15px; top: 28px; color: dark; pointer-events: none;">days</span>
                                         </div>
                                     </div>
                                     <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                         <div class="form-group">
                                             <label for="Non Member Amount">Standard Rate</label>
-                                            <input type="number" class="form-control" id="nmemAmt" placeholder="Enter Standard Rate">
+                                            <input type="number" class="form-control" id="std_rate" placeholder="Enter Standard Rate">
                                         </div>
                                     </div>
                                     <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mb-2">
                                         <div class="form-group">
                                             <label for="Member Amount">Member Rate</label>
-                                            <input type="number" class="form-control" id="memAmt" placeholder="Enter Member Rate">
+                                            <input type="number" class="form-control" id="mem_rate" placeholder="Enter Member Rate">
                                         </div>
                                     </div>
                                     <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                         <div class="form-group">
                                             <label for="Penalty Amount">Penalty Amount</label>
-                                            <input type="number" class="form-control" id="penAmt" placeholder="Enter Penalty Amount">
+                                            <input type="number" class="form-control" id="pen_amt" placeholder="Enter Penalty Amount">
                                         </div>
                                     </div>
                                     <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mb-2">
                                         <div class="form-group">
                                             <label for="Damage Amount">Damage Amount</label>
-                                            <input type="number" class="form-control" id="damAmt" placeholder="Enter Damage Amount">
+                                            <input type="number" class="form-control" id="dam_amt" placeholder="Enter Damage Amount">
                                         </div>
                                     </div>
                                     <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                         <div class="form-group">
                                             <label for="Date Purchased">Date Purchased</label>
-                                            <input type="date" class="form-control" id="datePurch" placeholder="Enter Date Purchased" oninput="capitalizeName(this)">
+                                            <input type="date" class="form-control" id="date_purch" placeholder="Enter Date Purchased" oninput="capitalizeName(this)">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row gutters">
                                     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                                         <div class="d-flex justify-content-end mt-3">
-                                            <button type="button" id="add" name="submit" class="btn btn-primary ">Add</button>
+                                            <!-- <button type="button" id="add" name="submit" class="btn btn-primary ">Add</button> -->
+                                            <button type="button" id="submitBtn" class="btn btn-primary" onclick="handleFormSubmit(currentAction, currentId)">Add</button>
                                             <button type="button" class="btn btn-danger ms-2" data-bs-dismiss="modal">Close</button>
                                         </div>
                                     </div>
@@ -316,109 +313,6 @@
                 </div>
             </div>
         </div>
-        <!-- add assets modal -->
-
-        <!-- edit asset modal -->
-        <div class="modal fade" id="editAssetsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="1" aria-hidden="true">
-            <div class="modal-dialog" style="max-width: 800px; overflow:hidden;">
-                <div class="table-data">
-                    <div class="order">
-                        <div class="modal-content" style="border:none; background: var(--light);">
-                            <div class="modal-body" id="modal-content">
-                                <div class="row gutters">
-                                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-2">
-                                        <h5 class="mb-2 text-primary">Update Asset Details</h5>
-                                    </div>
-                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mb-2">
-                                        <div class="form-group">
-                                            <label for="Asset Name">Asset Name</label>
-                                            <input type="text" class="form-control" id="eassName" placeholder="Enter Asset Name" oninput="capitalizeName(this)">
-                                            <input type="hidden" id="ra_id">
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 ">
-                                        <div class="form-group">
-                                            <label for="Quantity">Quantity</label>
-                                            <input type="number" class="form-control" id="eqty" placeholder="Enter Quantity" oninput="capitalizeName(this)">
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mb-2">
-                                        <!-- <div class="form-group">
-                                            <label for="Rental Period">Rental Period</label>
-                                            <input type="text" class="form-control" id="erentPerd" placeholder="Enter Rental Period" oninput="capitalizeName(this)">
-                                        </div> -->
-                                        <div class="form-group" style="position: relative;">
-                                            <label for="Rental Period">Rental Period</label>
-                                            <input type="text" class="form-control" id="erentPerd" placeholder="0" style="padding-right: 50px;">
-                                            <span style="position: absolute; right: 15px; top: 28px; color: dark; pointer-events: none;">days</span>
-                                        </div>
-
-                                    </div>
-                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                        <div class="form-group">
-                                            <label for="Non Member Amount">Standard Rate</label>
-                                            <input type="number" class="form-control" id="enmemAmt" placeholder="Enter Standard Rate">
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mb-2">
-                                        <div class="form-group">
-                                            <label for="Member Amount">Member Rate</label>
-                                            <input type="number" class="form-control" id="ememAmt" placeholder="Enter Member Rate">
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                        <div class="form-group">
-                                            <label for="Penalty Amount">Penalty Amount</label>
-                                            <input type="number" class="form-control" id="epenAmt" placeholder="Enter Penalty Amount">
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mb-2">
-                                        <div class="form-group">
-                                            <label for="Damage Amount">Damage Amount</label>
-                                            <input type="number" class="form-control" id="edamAmt" placeholder="Enter Damage Amount">
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                        <div class="form-group">
-                                            <label for="Date Purchased">Date Purchased</label>
-                                            <input type="date" class="form-control" id="edatePurch" placeholder="Enter Date Purchased" oninput="capitalizeName(this)">
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                        <!-- <div class="form-group">
-                                        <label for="estatus">Status</label>
-                                        <select class="form-control" id="estatus" name="estatus">
-                                            <option value="1">Serviceable</option>
-                                            <option value="0">Unserviceable</option>
-                                        </select>
-                                    </div> -->
-                                        <div class="form-group">
-                                            <label for="estatus">Status</label>
-                                            <div class="dropdown-wrapper">
-                                                <i class="fa fa-caret-down"></i>
-                                                <select class="form-control" id="estatus" name="estatus">
-                                                    <option value="1">Serviceable</option>
-                                                    <option value="0">Unserviceable</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row gutters">
-                                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                        <div class="d-flex justify-content-end mt-3">
-                                            <button type="button" id="update" name="submit" class="btn btn-primary ">Update</button>
-                                            <button type="button" class="btn btn-danger ms-2" data-bs-dismiss="modal">Close</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- edit asset modal -->
 
         <!-- rent modal -->
         <div class="modal fade" id="addRenterModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
@@ -437,7 +331,7 @@
 
                                 <label for="Full Name">Full Name</label>
                                 <input type="text" class="form-control" id="name" placeholder="Enter Full Name" autocomplete="off" oninput="capitalizeName(this)" required>
-                                <input type="hidden" id="hdId"> <!-- Store selected user ID -->
+                                <input type="hidden" id="hdId">
 
                                 <div id="rentDropdown" class="dropdown-menu" style="height: 200px; width:94%; overflow-y: auto; display: none;">
                                     <div id="dropdownRent"></div>
@@ -570,22 +464,33 @@
         <!-- issuance modal -->
 
         <!-- pay modal -->
-        <div class="modal fade" id="payMoneyModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal fade" id="viewRenterModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog" style="max-width: 800px; overflow:hidden;">
                 <div class="table-data">
                     <div class="order">
-                        <!-- <div class="modal-content"> -->
                         <div class="modal-content" style="border:none; background: var(--light);">
                             <div class="modal-header" style="display: flex; width: 100%;">
                                 <div>
-                                    <div id="header_name" style="font-family: Arial; font-size: 16px; padding-bottom: 10px;"></div>
-                                    <div id="item" style="font-family: Arial; font-size: 16px; padding-bottom: 10px;"></div>
-                                    <div id="amountToPay" style="font-family: Arial; font-size: 16px;"></div>
+                                    <div>
+                                        <label class="form-label">Rented By : <span id="header_name" style="font-weight: bold;"></span> </label>
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Rented Item : <span id="item" style="font-weight: bold;"></span> </label>
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Amount : ₱ <span id="amountToPay" style="font-weight: bold;"></span> </label>
+                                    </div>
                                 </div>
                                 <div>
-                                    <div id="rentPeriod" style="font-family: Arial; font-size: 16px; padding-bottom: 10px; text-align: left;"></div>
-                                    <div id="penaltyAmount" style="font-family: Arial; font-size: 16px; text-align: left; padding-bottom: 10px;"></div>
-                                    <!-- <div id="computation" style="font-family: Arial; font-size: 16px;  text-align: left;"></div> -->
+                                    <div>
+                                        <label class="form-label">Status : <span id="status" style="font-weight: bold;"></span> </label>
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Rent Period : <span id="rentPeriod" style="font-weight: bold;"></span> </label>
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Penalty : <span id="penaltyAmount" style="font-weight: bold;"></span> </label>
+                                    </div>
                                 </div>
                             </div>
                             <div class="modal-body">
@@ -655,13 +560,13 @@
 
                                             <div class="col-md-3" id="amountContainer" style="display: none;">
                                                 <label for="amount">Amount</label>
-                                                <input type="number" class="form-control" id="damageAmount" placeholder="Amount">
+                                                <input type="number" class="form-control" id="damageAmount" placeholder="Amount" readonly>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="d-flex justify-content-end mt-3">
-                                        <button type="submit" class="btn btn-primary">Pay</button>
+                                        <button type="submit" id="payBtn" class="btn btn-primary">Pay</button>
                                         <button type="button" class="btn btn-danger ms-2" data-bs-dismiss="modal">Close</button>
                                     </div>
 
@@ -678,6 +583,10 @@
 </section>
 
 <script>
+
+    let currentId = 0;
+    let type = "";
+    
     $(document).ready(function() {
         $('#addRenterModal, #addIssueModal, #addAssetsModal').on('show.bs.modal', function() {
             let modal = $(this);
@@ -685,7 +594,7 @@
             modal.find('.rental-form:not(:first)').remove();
         });
 
-        $('#payMoneyModal, #addRenterModal').on('hidden.bs.modal', function() {
+        $('#viewRenterModal, #addRenterModal').on('hidden.bs.modal', function() {
             $('#confirmCheckbox').prop('checked', false);
             $('#memberCheck').prop('checked', false);
             $('#quantityContainer, #amountContainer').hide();
@@ -704,7 +613,7 @@
     });
 
 
-    var table_data = $("#assets-table").DataTable({
+    var assets_table = $("#assets-table").DataTable({
         columnDefs: [{
             targets: '_all',
             orderable: false
@@ -718,13 +627,8 @@
             url: '<?php echo site_url('Rental_ctrl/getAssets'); ?>',
             type: 'POST',
             data: function(d) {
-                return {
-                    start: d.start,
-                    length: d.length,
-                    order: d.order,
-                    search: d.search.value,
-                    draw: d.draw
-                };
+                d.start = d.start || 0;
+                d.length = d.length || 10
             },
             dataType: 'json',
             error: function(xhr, status, error) {
@@ -732,50 +636,43 @@
             }
         },
         columns: [
-            // {
-            //     data: 'id',
-            //     render: function(data, type, row) {
-            //         const idNo = String(row.id).padStart(4, '0');
-            //         return idNo;
-            //     }
-            // },
             {
-                data: 'ra_desc'
+                data: 'desc'
             },
             {
-                data: 'ra_qty'
+                data: 'qty'
             },
             {
-                data: 'ra_vacant_qty'
+                data: 'vacant_qty'
             },
             {
-                data: 'ra_damage_qty'
+                data: 'damage_qty'
             },
             {
-                data: 'ra_amount',
+                data: 'std_amt',
                 render: function(data, type, row) {
-                    let amount = parseFloat(data).toFixed(2); // Format ra_amount
-                    let memberAmount = row.ra_amount_member ? parseFloat(row.ra_amount_member).toFixed(2) : "0.00"; // Format ra_amount_member
+                    let amount = parseFloat(data).toFixed(2);
+                    let memberAmount = row.mem_amt ? parseFloat(row.mem_amt).toFixed(2) : "0.00";
 
                     return `₱ ${amount} / ₱ ${memberAmount}`;
                 }
             },
             {
-                data: 'ra_penalty_amount',
+                data: 'penalty_amt',
                 render: function(data, type, row) {
                     return `₱ ${parseFloat(data).toFixed(2)}`;
                 }
             },
             {
-                data: 'ra_date_purch',
+                data: 'date_purch',
                 render: function(data, type, row) {
                     return formatDate(data);
                 }
             },
             {
-                data: 'ra_status',
+                data: 'status',
                 render: function(data, type, row) {
-                    if (data == 1) {
+                    if (data === "good") {
                         return '<span class="badge bg-success">Serviceable</span>';
                     } else {
                         return '<span class="badge bg-danger">Unserviceable</span>';
@@ -787,10 +684,10 @@
                 render: function(data, type, row) {
                     return `
                         <div style="text-center">
-                            ${row.r_status != 1 ? `
+                            ${row.status != "damaged" ? `
                                 <button class="btn btn-primary btn-sm" 
                                         style="padding: 2px 6px; font-size: 12px;" 
-                                        onclick="editAsset('${data}')">
+                                        onclick='openModal("editAsset", ${JSON.stringify(row)})'>
                                     <i class="fas fa-edit edit-icon" style="font-size: 12px;"></i> Edit
                                 </button>
                             ` : ''}
@@ -804,9 +701,8 @@
 
     var table_data = $("#renter-table").DataTable({
         "language": {
-            "infoFiltered": " ", // To remove the Filtered From
+            "infoFiltered": " ",
         },
-        // stateSave: true, // Enables state saving    
         columnDefs: [{
             targets: '_all',
             orderable: false
@@ -820,13 +716,8 @@
             url: '<?php echo site_url('Rental_ctrl/getRenter'); ?>',
             type: 'POST',
             data: function(d) {
-                return {
-                    start: d.start,
-                    length: d.length,
-                    order: d.order,
-                    search: d.search.value,
-                    draw: d.draw
-                };
+                d.start = d.start || 0;
+                d.length = d.length || 10
             },
             dataType: 'json',
             error: function(xhr, status, error) {
@@ -834,61 +725,42 @@
             }
         },
         columns: [{
-                data: 'r_name',
+                data: 'full_name',
             },
             {
-                data: 'ra_desc'
+                data: 'desc'
             },
             {
-                data: 'r_rent_qty'
+                data: 'rent_qty'
             },
             {
-                data: 'r_amount',
+                data: 'total_amt',
                 render: function(data, type, row) {
                     return `₱ ${parseFloat(data).toFixed(2)}`;
                 }
             },
             {
-                data: 'r_rent_date',
+                data: 'rent_date',
                 render: function(data, type, row) {
                     return formatDate(data);
                 }
             },
             {
-                data: 'r_due_date',
+                data: 'due_date',
                 render: function(data, type, row) {
                     return formatDate(data);
                 }
             },
             {
-                data: 'r_date_returned',
+                data: 'date_returned',
                 render: function(data, type, row) {
                     return formatDate(data);
                 }
             },
-
-            // {
-            //     data: 'r_rent_penalty',
-            //     render: function(data, type, row) {
-            //         if (parseFloat(data) === 0) {
-            //             return ''; // or return 'None'; if you want to display "None"
-            //         }
-            //         return `₱ ${parseFloat(data).toFixed(2)}`;
-            //     }
-            // },
-            // {
-            //     data: 'r_total_amount',
-            //     render: function(data, type, row) {
-            //         if (parseFloat(data) === 0) {
-            //             return ''; // or return 'None'; if you want to display "None"
-            //         }
-            //         return `₱ ${parseFloat(data).toFixed(2)}`;
-            //     }
-            // },
             {
-                data: 'r_status',
+                data: 'status',
                 render: function(data, type, row) {
-                    if (data == 1) {
+                    if (data === "paid") {
                         return '<span class="badge bg-success">Paid</span>';
                     } else {
                         return '<span class="badge bg-danger">Pending</span>';
@@ -896,14 +768,14 @@
                 }
             },
             {
-                data: 'r_id',
+                data: 'id',
                 render: function(data, type, row) {
-                    return `<div style="display: flex; justify-content: center; align-items: center; margin-right:4px;">
-                                ${row.r_status != 1 ? `
-                                    <i class="fas fa-eye text-primary" style="cursor: pointer; font-size: 14px;" 
-                                        onclick="payMoney('${row.r_id}', '${row.ra_id}')"></i>
-                                ` : ''}
-                            </div>`;
+                    return`<div style="display: flex; justify-content: center; align-items: center; margin-right:4px;">
+                        ${row.status != "paids" ? `
+                            <i class="fas fa-eye text-primary" style="cursor: pointer; font-size: 14px;" 
+                                onclick="viewRenter('${data}', '${row.ra_id}')"></i>
+                        ` : ''}
+                    </div>`;
                 }
             }
         ]
@@ -924,13 +796,8 @@
             url: '<?php echo site_url('Rental_ctrl/getIssuance'); ?>',
             type: 'POST',
             data: function(d) {
-                return {
-                    start: d.start,
-                    length: d.length,
-                    order: d.order,
-                    search: d.search.value,
-                    draw: d.draw
-                };
+                d.start = d.start || 0;
+                d.length = d.length || 10
             },
             dataType: 'json',
             error: function(xhr, status, error) {
@@ -1110,19 +977,123 @@
                     }
                 }
             },
-            // {
-            //     data: 'r_id',
-            //     render: function(data, type, row) {
-            //         return `<div style="display: flex; justify-content: center; align-items: center; margin-right:4px;">
-            //                     ${row.r_status != 1 ? `
-            //                         <i class="fas fa-eye text-primary" style="cursor: pointer; font-size: 14px;" 
-            //                             onclick="payMoney('${row.r_id}', '${row.ra_id}')"></i>
-            //                     ` : ''}
-            //                 </div>`;
-            //     }
-            // }
         ]
     });
+
+    function openModal(action, row) {
+
+        console.log(row);
+
+        currentAction = action;
+
+        if (row) {
+            currentId = row.id;
+        }
+        console.log(currentId);
+
+        const modalEl = document.getElementById('addModal');
+        const submitBtn = document.getElementById('submitBtn');
+
+        if (document.querySelectorAll('.modal.show').length > 0) {
+            modalEl.classList.add('modal-stack');
+
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show modal-backdrop-stack';
+            document.body.appendChild(backdrop);
+        }
+
+        submitBtn.textContent = action.startsWith('add') ? 'Add' : 'Update';
+
+        if (action === 'editAsset' && row) {
+            $('#asset_name').val(row.desc);
+            $('#qty').val(row.qty);
+            $('#period').val(row.rent_period);
+            $('#std_rate').val(row.std_amt);
+            $('#mem_rate').val(row.mem_amt);
+            $('#pen_amt').val(row.penalty_amt);
+            $('#dam_amt').val(row.damage_amt);
+            $('#date_purch').val(row.date_purch);
+        }
+
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+
+        modalEl.addEventListener('hidden.bs.modal', () => {
+            modalEl.classList.remove('modal-stack');
+
+            const stackedBackdrop = document.querySelector('.modal-backdrop-stack');
+            if (stackedBackdrop) stackedBackdrop.remove();
+        }, { once: true });
+    }
+
+    function handleFormSubmit(action, id = null) {
+
+        if(id === null){
+            id= $('#asset_id').val();
+            console.log(id);
+        }
+        
+        const formData = {
+            name: $('#asset_name').val(),
+            qty: $('#qty').val(),
+            period: $('#period').val(),
+            std_rate: $('#std_rate').val(),
+            mem_rate: $('#mem_rate').val(),
+            pen_amt: $('#pen_amt').val(),
+            dam_amt: $('#dam_amt').val(),
+            date_purch: $('#date_purch').val()
+        };
+        
+       switch(action) {
+            case 'addAsset':
+                url = '<?php echo base_url("Rental_ctrl/addAsset"); ?>';
+                method = 'POST';
+                break;
+
+            case 'editAsset':
+                url = '<?php echo base_url("Rental_ctrl/updateAsset/"); ?>' + id;
+                method = 'POST';
+                break;
+        }
+
+        $.ajax({
+            url: url,
+            type: method,
+            data: formData,
+            dataType: 'json',
+            success: function(res) {
+                if (res.success) { 
+                    Swal.fire({ 
+                        title: 'Success', 
+                        text: 'Member added successfully', 
+                        icon: 'success', 
+                        timer: 1000, 
+                        showConfirmButton: false 
+                    }).then(() => { 
+                        assets_table.ajax.reload(); 
+                        if ($.fn.DataTable.isDataTable('#details_table')) {
+                            $('#details_table').DataTable().ajax.reload();
+                        }
+                    }); 
+                    } else {
+                        lert(res.message);
+                }
+            },
+            error: function(err) {
+                console.log(err);
+                alert('Server error. Check console.');
+            }
+        });
+        
+        const addModalEl = document.getElementById('addModal');
+        const modal = bootstrap.Modal.getInstance(addModalEl);
+        modal.hide();
+    }
+
+
+
+
+
 
     $('#add').click(function() {
         var assName = $('#assName').val().trim();
@@ -1380,18 +1351,14 @@
 
         $('.rental-form').each(function() {
             let rentedItemId = $(this).find('.rentedItemId').val();
-            let rentedItem = $(this).find('.rentedItem').val();
             let quantity = $(this).find('.quantity').val();
-            let amount = $(this).find('.amount').val();
             let totalAmount = $(this).find('.totalAmount').val();
             let rentPeriod = $(this).find('.rentPeriod').val();
 
             if (rentedItemId && quantity > 0) {
                 rentals.push({
                     rentedItemId: rentedItemId,
-                    rentedItem: rentedItem,
                     quantity: quantity,
-                    amount: amount,
                     totalAmount: totalAmount,
                     rentPeriod: rentPeriod
                 });
@@ -1432,10 +1399,12 @@
             data: {
                 name: renterName,
                 date: rentDate,
-                rentals: rentals
+                rentals: rentals,
+                type: type
             },
             dataType: 'json',
             success: function(response) {
+                console.log(response);
                 if (response.success) {
                     Swal.fire('Success', 'Rent added successfully', 'success');
 
@@ -1622,18 +1591,18 @@
                         <div class="col-md-4 mb-3">
                             <div class="card select-item" 
                                 data-id="${item.id}" 
-                                data-desc="${item.ra_desc}"
-                                data-rent="${item.ra_rent_period}"
-                                data-amount="${item.ra_amount}"
-                                data-member="${item.ra_amount_member}">
+                                data-desc="${item.desc}"
+                                data-rent="${item.rent_period}"
+                                data-amount="${item.std_amt}"
+                                data-member="${item.mem_amt}">
                         
                                 <div class="card-body">
-                                    <h5 class="card-title">${item.ra_desc}</h5>
-                                    <p class="card-text">Rent Period: ${item.ra_rent_period} ${item.ra_rent_period == 1 ? 'day' : 'days'}</p>
-                                    <p class="card-text">Penalty (pcs): ₱ ${parseFloat(item.ra_penalty_amount).toFixed(2)}</p>
-                                    <p class="card-text">Available: ${item.ra_vacant_qty}</p>
-                                    <p class="card-text">Amount: ₱ ${parseFloat(item.ra_amount).toFixed(2)}</p>
-                                    <p class="card-text">Member Amt: ₱ ${parseFloat(item.ra_amount_member).toFixed(2)}</p>
+                                    <h5 class="card-title">${item.desc}</h5>
+                                    <p class="card-text">Rent Period: ${item.rent_period} ${item.rent_period == 1 ? 'day' : 'days'}</p>
+                                    <p class="card-text">Penalty (pcs): ₱ ${parseFloat(item.penalty_amt).toFixed(2)}</p>
+                                    <p class="card-text">Available: ${item.vacant_qty}</p>
+                                    <p class="card-text">Amount: ₱ ${parseFloat(item.std_amt).toFixed(2)}</p>
+                                    <p class="card-text">Member Amt: ₱ ${parseFloat(item.mem_amt).toFixed(2)}</p>
                                 </div>
                             </div>
                         </div>
@@ -1671,9 +1640,11 @@
         return date.toLocaleDateString('en-US', options);
     }
 
-    function payMoney(r_id, ra_id) {
+    function viewRenter(r_id, ra_id) {
         $('#r_id').val(r_id);
         $('#ra_id').val(ra_id);
+
+        $('#viewRenterModal').modal('show');
 
         $.ajax({
             url: "<?php echo base_url('Rental_ctrl/getTotalAmount'); ?>",
@@ -1687,50 +1658,88 @@
                 console.log(response);
                 if (response.status === 'success') {
 
-                    let name = response.name;
-                    let item = response.item;
-                    let rentPeriod = response.rent_period;
-                    let penaltyAmt = response.penalty_amount;
-                    let amountToPay = parseFloat(response.total_amount / response.rent_qty);
+                    let data = response.data[0];
+                    let name = data.full_name;
+                    let item = data.desc;
+                    let status = data.rent_status;
+                    let damageQty = data.damage_qty;
 
-                    let dueDate = new Date(response.due_date);
-                    let rentQty = parseFloat(response.rent_qty);
-                    let currentAmount = parseFloat(response.total_amount);
-                    let penaltyPerDay = parseFloat(response.penalty_amount);
-                    let damageAmt = parseFloat(response.damageAmt);
-                    let totalPenalty = 0; // Initialize totalPenalty
+                    let statusText = "";
+                    let statusColorClass = "";
+
+                    switch (status) {
+                        case "pending":
+                            statusText = "Pending";
+                            statusColorClass = "text-danger"; 
+                            break;
+                        case "paid":
+                            statusText = "Paid";
+                            statusColorClass = "text-success";
+                            $('#payBtn').hide();
+                            break;
+                    }
+                    
+                    let penaltyAmt = data.penalty_amt;
+                    let amountToPay = parseFloat(data.total_amount);
+
+                    let rentPeriod = parseInt(data.rent_period);
+                    let rentDate = new Date(data.rent_date);
+                    rentDate.setDate(rentDate.getDate() + rentPeriod);
+                    let dueDate = rentDate
+
+                    let rentQty = parseFloat(data.rent_qty);
+                    let currentAmount = parseFloat(data.total_amount);
+                    let penaltyPerDay = parseFloat(data.penalty_amt);
+                    let damageAmt = parseFloat(data.damage_amt);
+                    let totalPenalty = 0; 
+
                     let formattedDueDate = dueDate.toLocaleDateString('en-US', {
                         month: 'long',
                         day: 'numeric',
                         year: 'numeric'
                     });
-
-                    // Set default values
-                    $('#header_name').html("Rented By - <strong>" + name + "</strong>");
-                    // $('#item').html("Rented Item - <strong>" + item + "</strong>");
-                    $('#item').html("Rented Item - <strong>" + item + "</strong> (" + rentQty + " " + (rentQty === 1 ? "pc" : "pcs") + ")");
-                    $('#itemAmount').html("Rented Item - <strong>" + item + "</strong>");
-                    $('#rentPeriod').html("Rent Period - <strong>" + rentPeriod + "</strong> " + (rentPeriod == 1 ? "day" : "days"));
-                    $('#penaltyAmount').html("Penalty - <strong>₱ " + parseFloat(penaltyAmt).toFixed(2) + "</strong>");
-                    $('#amountToPay').html("Amount - <strong>₱ " + parseFloat(amountToPay).toFixed(2) + "</strong>");
-                    $('#computation').html("Computation - <strong>(Penalty * Rent Period)" + "</strong>");
+                    
+                    $('#header_name').text(name);
+                    $('#item').text(item + " (" + rentQty + " " + (rentQty === 1 ? "pc" : "pcs") + ")");
+                    $('#rentPeriod').text(rentPeriod + " " + (rentPeriod == 1 ? "day" : "days"));
+                    $('#status').text(statusText).removeClass('text-danger text-primary text-success').addClass(statusColorClass);
+                    $('#penaltyAmount').text(parseFloat(penaltyAmt).toFixed(2));
+                    $('#amountToPay').text(parseFloat(amountToPay).toFixed(2));
                     $('#dueDate').val(formattedDueDate);
                     $('#amount').val(currentAmount.toFixed(2));
                     $('#quantity').val(rentQty);
                     $('#penalty').val(0);
                     $('#totalAmount').val(currentAmount.toFixed(2));
                     $('#damageAmount').val(damageAmt.toFixed(2));
-                    $('#damageQuantity').val(0).prop('disabled', true); // Disable damage quantity by default
+                    $('#damageQuantity').val(0).prop('disabled', true);
+                    $('#confirmCheckbox')
+                        .prop('checked', false)
+                        .prop('disabled', false);
+                    
 
-                    $('#payMoneyModal').modal('show'); // Show modal
+                    if (status === "paid" && data.rent_damage_qty != "0") {
+                        $('#dateRet').val(data.date_returned);
+                        $('#dateRet').prop('readonly', true);
 
-                    // When date is changed, check for penalty
+                        $('#confirmCheckbox')
+                        .prop('checked', true)
+                        .prop('disabled', true);
+
+                        $('#quantityContainer, #amountContainer').show();
+
+                        $('#damageQuantity')
+                            .prop('disabled', false)
+                            .val(data.rent_damage_qty);
+                    } else {
+                        $('#confirmCheckbox').closest('.form-group').hide();
+                    }
+
                     $('#dateRet').on('change', function() {
                         let returnDate = new Date($(this).val());
 
                         if (returnDate > dueDate) {
-                            let daysOverdue = Math.floor((returnDate - dueDate) / (1000 * 60 * 60 * 24)); // Calculate overdue days
-                            totalPenalty = penaltyPerDay * daysOverdue * rentQty; // Update totalPenalty
+                            let daysOverdue = Math.floor((returnDate - dueDate) / (1000 * 60 * 60 * 24));
+                            totalPenalty = penaltyPerDay * daysOverdue * rentQty;
 
                             $('#penalty').val(totalPenalty.toFixed(2));
                         } else {
@@ -1738,46 +1747,22 @@
                             $('#penalty').val(0);
                         }
 
-                        updateTotalAmount(); // Update total amount
+                        updateTotalAmount();
                     });
 
                     $('#damageQuantity').on('change', function() {
-                        // let damQty = parseFloat($(this).val()) || 0;
-
-                        // if (damQty > rentQty) {
-                        //     Swal.fire({
-                        //         icon: 'warning',
-                        //         title: 'Invalid Quantity',
-                        //         text: 'Damage quantity cannot exceed rented quantity!',
-                        //         confirmButtonColor: '#d33'
-                        //     });
-                        //     $(this).val(rentQty); // Reset to max allowable quantity
-                        // }
-
                         updateTotalAmount();
                     });
 
                     $('#damageAmount').on('change', function() {
-                        // let damAmt = parseFloat($(this).val()) || 0;
-
-                        // if (damAmt > damageAmt) {
-                        //     Swal.fire({
-                        //         icon: 'warning',
-                        //         title: 'Invalid Amount',
-                        //         text: 'Amount cannot exceed damage amount!',
-                        //         confirmButtonColor: '#d33'
-                        //     });
-                        //     $(this).val(damageAmt); // Reset to max allowable quantity
-                        // }
-
                         updateTotalAmount();
                     });
 
                     $('#confirmCheckbox').on('change', function() {
                         if ($(this).is(':checked')) {
-                            $('#damageQuantity').prop('disabled', false); // Enable input
+                            $('#damageQuantity').prop('disabled', false); 
                         } else {
-                            $('#damageQuantity').prop('disabled', true).val(0); // Disable and reset input
+                            $('#damageQuantity').prop('disabled', true).val(0);
                         }
                         updateTotalAmount();
                     });
@@ -1805,21 +1790,24 @@
         e.preventDefault();
 
         let ra_id = $('#ra_id').val();
-        let r_id = $('#r_id').val();
-        let date = $('#dateRet').val();
+        let id = $('#r_id').val();
+        let return_date = $('#dateRet').val();
         let quantity = $('#quantity').val();
         let penalty = $('#penalty').val();
         let damageQty = $('#damageQuantity').val();
         let damageAmt = $('#damageAmount').val();
         let totalAmount = $('#totalAmount').val();
-        let amount = $('#amount').val();
-        // let amount = $('#amount').val();
 
+        console.log(ra_id);
         console.log(quantity);
+        console.log(id);
+        console.log(return_date);
+        console.log(penalty);
         console.log(damageQty);
-        // console.log(damageQty);
+        console.log(damageAmt);
+        console.log(totalAmount);
 
-        if (date.length === 0) {
+        if (return_date.length === 0) {
             Swal.fire({
                 icon: 'warning',
                 title: 'Missing Date Returned',
@@ -1827,9 +1815,6 @@
             });
             return;
         }
-
-        // console.log(r_id);
-        // console.log(date);
 
         Swal.fire({
             title: "Confirmation",
@@ -1846,12 +1831,11 @@
                     url: "<?php echo base_url('Rental_ctrl/updateRenterStatus'); ?>",
                     type: "POST",
                     data: {
-                        id: r_id,
+                        id: id,
                         ra_id: ra_id,
-                        date: date,
+                        return_date: return_date,
                         penalty: penalty,
                         total_amount: totalAmount,
-                        amount: amount,
                         quantity: quantity,
                         damageAmt: damageAmt,
                         damageQty: damageQty
@@ -1871,11 +1855,11 @@
                             $('#damageQuantity, #damageAmount').val('');
 
                             // Reset all input fields when modal is closed
-                            $('#payMoneyModal').on('hidden.bs.modal', function() {
+                            $('#viewRenterModal').on('hidden.bs.modal', function() {
                                 $(this).find('form')[0].reset();
                             });
 
-                            $('#payMoneyModal').modal('hide');
+                            $('#viewRenterModal').modal('hide');
 
                             // Reload tables
                             $('#renter-table').DataTable().ajax.reload();
@@ -1965,10 +1949,11 @@
             $("#name").val(""); // Clear input when toggling
             $("#hdId").val(""); // Clear stored user ID
             if ($(this).is(":checked")) {
-                // $("#name").attr("readonly", true); // Disable manual entry
+               type = "member";
             } else {
                 $("#name").attr("readonly", false); // Enable manual entry
                 $("#rentDropdown").hide(); // Hide dropdown
+                type = "standard";
             }
         });
 

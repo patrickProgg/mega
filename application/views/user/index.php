@@ -1,15 +1,15 @@
 <style>
-    #addFamModal {
-        z-index: 1060 !important;
-        /* Higher than default 1050 */
-    }
+#addFamModal {
+    z-index: 1060 !important;
+    /* Higher than default 1050 */
+}
 
-    .dropdown-menu {
-        font-size: 15px;
-    }
+.dropdown-menu {
+    font-size: 15px;
+}
 
-    label {
-    font-size: 12px; /* or whatever size you want */
+#addModal label {
+  font-size: 13px;
 }
 
 .modal.modal-stack {
@@ -45,31 +45,6 @@
                             </button>
 
                             <!-- <button onclick="openModal('addParent')">Add Parent</button> -->
-
-                            <div class="dropdown">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButtonAddress" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Address
-                                </button>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButtonAddress" id="address-filter" style="cursor:pointer;">
-                                    <a class="dropdown-item">Address</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" data-status="Masayag">Masayag</a>
-                                    <a class="dropdown-item" data-status="East">East</a>
-                                </div>
-                            </div>
-
-                            <div class="dropdown">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButtonStatus" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Status
-                                </button>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButtonStatus" id="status-filter" style="cursor:pointer;">
-                                    <a class="dropdown-item">Status</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" data-status="1">Active</a>
-                                    <a class="dropdown-item" data-status="3">Inactive</a>
-                                    <a class="dropdown-item" data-status="2">Deceased</a>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </ul>
@@ -122,7 +97,7 @@
                         <tr>
                             <th style="width:300px;">FULL NAME</th>
                             <th>ADDRESS</th>
-                            <th style="width:200px;">PHONE</th>
+                            <th style="width:300px;">PHONE</th>
                             <th style="width:120px;">STATUS</th>
                             <th style="width:80px;">ACTION</th>
                         </tr>
@@ -181,13 +156,13 @@
                                             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                                 <div class="form-group">
                                                     <label for="Phone 1">Phone 1</label>
-                                                    <input type="text" class="form-control" id="phone1" placeholder="Enter phone number">
+                                                    <input type="text" class="form-control" id="phone1" placeholder="Enter phone number"  maxlength="11">
                                                 </div>
                                             </div>
                                             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                                 <div class="form-group">
                                                     <label for="Phone 2">Phone 2</label>
-                                                    <input type="text" class="form-control" id="phone2" placeholder="Enter phone number">
+                                                    <input type="text" class="form-control" id="phone2" placeholder="Enter phone number"  maxlength="11">
                                                 </div>
                                             </div>
                                         </div>
@@ -450,9 +425,7 @@
             type: 'POST',
             data: function(d) {
                 d.start = d.start || 0;
-                d.length = d.length || 10;
-                d.status = $('#status-filter .dropdown-item.active').data('status') || '',
-                d.address = $('#address-filter .dropdown-item.active').data('status') || ''
+                d.length = d.length || 10
             },
             dataType: 'json',
             error: function(xhr, status, error) {
@@ -467,7 +440,10 @@
                 data: 'address'
             },
             {
-                data: 'phone1',
+                data: null,
+                render: function(data, type, row) {
+                    return row.phone1 + ' / ' + row.phone2;
+                }
             },
             {
                 data: 'status',
@@ -486,16 +462,13 @@
                 render: function(data, type, row) {
                     return `
                         <div style="display: flex; gap: 10px;">
-                            <!-- View Icon -->
                             <i class="fas fa-eye view-icon text-primary" style="cursor: pointer; font-size: 14px;" 
                                 onclick="openViewModal('${row.hd_id}', '${row.full_name}')"></i>
 
-                            <!-- Edit Icon -->
                             <i class="fas fa-edit text-warning" style="cursor:pointer; font-size:14px;"
                                 onclick='openModal("editParent", ${JSON.stringify(row)})'></i>
 
-                            <!-- Send To Icon (Hidden if status is 2) -->
-                            ${row.status != 2 ? `
+                            ${row.status != "deceased" ? `
                                 <i class="fas fa-paper-plane text-info" style="cursor: pointer; font-size: 14px;" 
                                     onclick="sendTo('${row.hd_id}')"></i>
                             ` : ''}
@@ -534,7 +507,6 @@
                 dataType: 'json',
                 data: function(d) {
                     d.id = id;
-                    return d;
                 },
                 error: function(xhr, status, error) {
                     console.error("AJAX request failed:", xhr.responseText);
@@ -700,7 +672,10 @@
                         showConfirmButton: false 
                     }).then(() => { 
                         table_data.ajax.reload(); 
-                        $('#details_table').DataTable().ajax.reload(); }); 
+                        if ($.fn.DataTable.isDataTable('#details_table')) {
+                            $('#details_table').DataTable().ajax.reload();
+                        }
+                    }); 
                     } else {
                         lert(res.message);
                 }
@@ -750,7 +725,7 @@
                     confirmButtonText: 'OK'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        location.reload(); // Refresh the page after user clicks "OK"
+                        location.reload();
                     }
                 });
             },
@@ -798,63 +773,12 @@
             let today = new Date();
             let age = today.getFullYear() - birthDate.getFullYear();
 
-            // Adjust if birthday hasn't occurred this year yet
             let monthDiff = today.getMonth() - birthDate.getMonth();
             if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
                 age--;
             }
 
-            $('#age').val(age); // Set calculated age in input field
+            $('#age').val(age);
         });
     });
-
-    $(document).ready(function() {
-        $('#e_birthday').on('change', function() {
-            let birthDate = new Date($(this).val());
-            let today = new Date();
-            let age = today.getFullYear() - birthDate.getFullYear();
-
-            // Adjust if birthday hasn't occurred this year yet
-            let monthDiff = today.getMonth() - birthDate.getMonth();
-            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-                age--;
-            }
-
-            $('#e_age').val(age); // Set calculated age in input field
-        });
-    });
-
-    $('#status-filter .dropdown-item').click(function() {
-        var selectedStatus = $(this).data('status');
-        var selectedText = $(this).text();
-
-        // Add 'active' class to selected, remove from others
-        $('#status-filter .dropdown-item').removeClass('active');
-        $(this).addClass('active');
-
-        $('#dropdownMenuButtonStatus').text(selectedText);
-
-        // Reload the table with the selected filter
-        table_data.ajax.reload();
-    });
-
-    $('#headerStatus, #headerAddress').click(function() {
-        location.reload();
-    });
-
-    
-    $('#address-filter .dropdown-item').click(function() {
-        var selectedStatus = $(this).data('status');
-        var selectedText = $(this).text();
-
-        // Add 'active' class to selected, remove from others
-        $('#address-filter .dropdown-item').removeClass('active');
-        $(this).addClass('active');
-
-        $('#dropdownMenuButtonAddress').text(selectedText);
-
-        // Reload the table with the selected filter
-        table_data.ajax.reload();
-    });
-
 </script>

@@ -132,7 +132,7 @@
         </div>
         <div class="footer-text">
             ©
-            <script>document.write(new Date().getFullYear())</script> WMS URC.
+            <script>document.write(new Date().getFullYear())</script> MEGA.
         </div>
     </div>
 </div>

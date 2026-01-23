@@ -27,78 +27,151 @@ class Rental_ctrl extends CI_Controller
 
     public function getAssets()
     {
-        if ($this->input->is_ajax_request()) {
-            $start = $this->input->post('start');
-            $length = $this->input->post('length');
-            $order = $this->input->post('order');
-            $search = $this->input->post('search');
+        $start = $this->input->post('start');
+        $length = $this->input->post('length');
+        $searchValue = trim($this->input->post('search')['value']);
 
-            $column_index = isset($order[0]['column']) ? $order[0]['column'] : 0;
-            $sort_direction = isset($order[0]['dir']) ? $order[0]['dir'] : 'asc';
+        $this->db->select("
+            id,
+            desc,
+            qty,
+            vacant_qty,
+            rent_period,
+            std_amt,
+            mem_amt,
+            penalty_amt,
+            damage_qty,
+            damage_amt,
+            date_purch,
+            status
+        ");
 
-            $data = $this->Rental_mod->getAssets($start, $length, $column_index, $sort_direction, $search);
+        $this->db->from('tbl_rental_asset');
 
-            $response = [
-                "draw" => intval($this->input->post('draw')),
-                "recordsTotal" => $data['total_records'],
-                "recordsFiltered" => $data['filtered_records'],
-                "data" => $data['data']
-            ];
-            echo json_encode($response);
+        $this->db->order_by('id', 'DESC');
+
+        if (!empty($searchValue)) {
+            $this->db->group_start();
+            $this->db->like('fname', $searchValue);
+            $this->db->or_like('lname', $searchValue);
+            $this->db->or_like("CONCAT_WS(', ', purok, barangay, city, province)",$searchValue,'both',false);
+            $this->db->or_like('phone1', $searchValue);
+            $this->db->group_end();
         }
+
+        $subQuery = clone $this->db;
+        $recordsFiltered = $subQuery->get()->num_rows();
+
+        $this->db->limit($length, $start);
+        $query = $this->db->get();
+        $data = $query->result_array();
+
+        echo json_encode([
+            "draw" => intval($this->input->post('draw')),
+            "recordsTotal" => $recordsFiltered,
+            "recordsFiltered" => $recordsFiltered,
+            "data" => $data
+        ]);
     }
 
     public function getRenter()
     {
-        if ($this->input->is_ajax_request()) {
-            $start = $this->input->post('start');
-            $length = $this->input->post('length');
-            $order = $this->input->post('order');
-            $search = $this->input->post('search');
+        $start = $this->input->post('start');
+        $length = $this->input->post('length');
+        $searchValue = trim($this->input->post('search')['value']);
 
-            $column_index = isset($order[0]['column']) ? $order[0]['column'] : 0;
-            $sort_direction = isset($order[0]['dir']) ? $order[0]['dir'] : 'asc';
+        $this->db->select("
+            a.id,
+            a.full_name,
+            a.ra_id,
+            a.rent_qty,
+            a.damage_qty,
+            a.status,
+            a.rent_date,
+            a.due_date,
+            a.date_returned,
+            b.desc,
+            b.qty,
+            CASE
+                WHEN a.type = 'member'
+                    THEN a.rent_qty * b.mem_amt
+                ELSE
+                    a.rent_qty * b.std_amt
+            END AS total_amt
+        ");
 
-            $data = $this->Rental_mod->getRenter($start, $length, $column_index, $sort_direction, $search);
+        $this->db->from('tbl_renter as a');
+        $this->db->join('tbl_rental_asset as b','b.id = a.ra_id','left');
 
-            $response = [
-                "draw" => intval($this->input->post('draw')),
-                "recordsTotal" => $data['total_records'],
-                "recordsFiltered" => $data['filtered_records'],
-                "data" => $data['data']
-            ];
-            echo json_encode($response);
+        $this->db->order_by('id', 'DESC');
+
+        if (!empty($searchValue)) {
+            $this->db->group_start();
+            $this->db->like('a.full_name', $searchValue);
+            $this->db->or_like('b.desc', $searchValue);
+            $this->db->group_end();
         }
+
+        $subQuery = clone $this->db;
+        $recordsFiltered = $subQuery->get()->num_rows();
+
+        $this->db->limit($length, $start);
+        $query = $this->db->get();
+        $data = $query->result_array();
+
+        echo json_encode([
+            "draw" => intval($this->input->post('draw')),
+            "recordsTotal" => $recordsFiltered,
+            "recordsFiltered" => $recordsFiltered,
+            "data" => $data
+        ]);
     }
 
     public function getIssuance()
     {
-        if ($this->input->is_ajax_request()) {
-            $start = $this->input->post('start');
-            $length = $this->input->post('length');
-            $order = $this->input->post('order');
-            $search = $this->input->post('search');
+        $start = $this->input->post('start');
+        $length = $this->input->post('length');
+        $searchValue = trim($this->input->post('search')['value']);
 
-            $column_index = isset($order[0]['column']) ? $order[0]['column'] : 0;
-            $sort_direction = isset($order[0]['dir']) ? $order[0]['dir'] : 'asc';
+        $this->db->select("
+            a.*,
+            b.desc,
+            b.qty,
+            CONCAT(c.fname, ' ', c.lname) AS full_name, 
+        ");
 
-            $data = $this->Rental_mod->getIssuance($start, $length, $column_index, $sort_direction, $search);
+        $this->db->from('tbl_supp_renter as a');
+        $this->db->join('tbl_rental_asset as b','b.id = a.ra_id','left');
+        $this->db->join('tbl_user_hd as c','c.hd_id = a.hd_id','left');
 
-            $response = [
+        $this->db->order_by('id', 'DESC');
 
-                "draw" => intval($this->input->post('draw')),
-                "recordsTotal" => $data['total_records'],
-                "recordsFiltered" => $data['filtered_records'],
-                "data" => $data['data']
-            ];
-            echo json_encode($response);
+        if (!empty($searchValue)) {
+            $this->db->group_start();
+            $this->db->like('a.full_name', $searchValue);
+            $this->db->or_like('b.desc', $searchValue);
+            $this->db->group_end();
         }
+
+        $subQuery = clone $this->db;
+        $recordsFiltered = $subQuery->get()->num_rows();
+
+        $this->db->limit($length, $start);
+        $query = $this->db->get();
+        $data = $query->result_array();
+
+        echo json_encode([
+            "draw" => intval($this->input->post('draw')),
+            "recordsTotal" => $recordsFiltered,
+            "recordsFiltered" => $recordsFiltered,
+            "data" => $data
+        ]);
     }
 
     public function get_rental_items()
     {
-        $this->db->where('ra_status', 1);
-        $query = $this->db->get('rental_asset');
+        $this->db->where('status', 'good');
+        $query = $this->db->get('tbl_rental_asset');
         echo json_encode($query->result());
     }
 
@@ -152,34 +225,52 @@ class Rental_ctrl extends CI_Controller
 
     public function addAsset()
     {
-        if ($this->input->is_ajax_request()) {
+        $data = $this->input->post();
 
-            $data = $this->input->post();
+        $assetData = [
+            'desc' => $data['name'],
+            'qty' => $data['qty'],
+            'vacant_qty'  => $data['qty'],
+            'rent_period'   => $data['period'],
+            'std_amt'        => $data['std_rate'],
+            'mem_amt'     => $data['mem_rate'],
+            'penalty_amt'     => $data['pen_amt'],
+            'damage_amt'      => $data['dam_amt'],
+            'date_purch'      => $data['date_purch']
+        ];
 
-            $assetData = [
-                'ra_desc' => $data['asset'],
-                'ra_qty' => $data['qty'],
-                'ra_vacant_qty'  => $data['qty'],
-                'ra_rent_period'   => $data['rentPeriod'],
-                'ra_amount'        => $data['nonMemAmt'],
-                'ra_amount_member'     => $data['memAmt'],
-                'ra_penalty_amount'     => $data['penAmt'],
-                'ra_damage_qty'      => 0,
-                'ra_damage_amount'      => $data['damAmt'],
-                'ra_date_purch'      => $data['datePurch'],
-                'ra_status'      => 0,
-            ];
+        $insert = $this->db->insert('tbl_rental_asset', $assetData);
 
-            // Insert into database
-            $insert = $this->db->insert('rental_asset', $assetData);
-
-            if ($insert) {
-                echo json_encode(['success' => true, 'message' => 'Asset added successfully']);
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Database insert failed']);
-            }
+        if ($insert) {
+            echo json_encode(['success' => true, 'message' => 'Asset added successfully']);
         } else {
-            show_error('No direct access allowed');
+            echo json_encode(['success' => false, 'message' => 'Database insert failed']);
+        }
+    }
+
+     public function updateAsset($id)
+    {
+        $data = $this->input->post();
+       
+        $updateAssetData = [
+            'desc' => $data['name'],
+            'qty' => $data['qty'],
+            'vacant_qty'  => $data['qty'],
+            'rent_period'   => $data['period'],
+            'std_amt'        => $data['std_rate'],
+            'mem_amt'     => $data['mem_rate'],
+            'penalty_amt'     => $data['pen_amt'],
+            'damage_amt'      => $data['dam_amt'],
+            'date_purch'      => $data['date_purch']
+        ];
+
+        $this->db->where('id', $id);
+        $update = $this->db->update('tbl_rental_asset', $updateAssetData);
+
+        if ($update) {
+            echo json_encode(['success' => true, 'message' => 'Asset updated successfully']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Database update failed']);
         }
     }
 
@@ -205,59 +296,57 @@ class Rental_ctrl extends CI_Controller
 
     public function save_rental()
     {
-        if ($this->input->is_ajax_request()) {
-            $rent_details = $this->input->post('rentals'); // Get all rental items
-            $rentername = $this->input->post('name');
-            $date = $this->input->post('date');
-            // $dateNow = date('Y-m-d'); // Format: YYYY-MM-DD
+        $rent_details = $this->input->post('rentals');
+        $rentername  = $this->input->post('name');
+        $date        = $this->input->post('date');
+        $type        = $this->input->post('type');
 
-            if (!empty($rent_details) && is_array($rent_details)) {
-                $insert_status = true; // Track insert success
-                $error_message = ''; // Track error message
+        $this->db->trans_start(); // 🔒 start transaction
 
-                foreach ($rent_details as $rental) {
-                    $rentPeriod = intval($rental['rentPeriod']); // Convert rent period to integer
-                    $due_date = date('Y-m-d', strtotime($date . " + $rentPeriod days")); // Calculate due date
+        foreach ($rent_details as $rental) {
 
-                    $available_qty = $this->Rental_mod->getAvailableQty($rental['rentedItemId']);
+            $rentPeriod = (int) $rental['rentPeriod'];
+            $due_date   = date('Y-m-d', strtotime($date . " + {$rentPeriod} days"));
 
-                    $qty = $rental['quantity'];
-                    $ra_id = $rental['rentedItemId'];
+            $ra_id = $rental['rentedItemId'];
+            $qty   = (int) $rental['quantity'];
 
+            $available_qty = $this->Rental_mod->getAvailableQty($ra_id);
 
-                    if ($rental['quantity'] > $available_qty) {
-                        echo json_encode(['success' => false, 'message' => "Not enough stock for item: " . $rental['rentedItem']]);
-                        return; // Stop execution
-                    }
-
-                    $data = array(
-                        'r_name' => $rentername,
-                        'ra_id' => $rental['rentedItemId'], // Use rental array data
-                        'r_rent_qty' => $rental['quantity'],
-                        'r_amount' => $rental['totalAmount'],
-                        'r_rent_date' => $date,
-                        'r_due_date' => $due_date,
-                    );
-
-                    $insert = $this->Rental_mod->insert_rental($data);
-
-                    if ($insert) {
-                        $this->Rental_mod->updateItemQty($qty, $ra_id);
-                    } else {
-                        $insert_status = false;
-                    }
-                }
-
-                if (!$insert_status && !empty($error_message)) {
-                    echo json_encode(['success' => false, 'message' => $error_message]);
-                } else {
-                    echo json_encode(['success' => $insert_status]);
-                }
-            } else {
-                echo json_encode(['success' => false, 'message' => 'No rental data received.']);
+            if ($qty > $available_qty) {
+                $this->db->trans_rollback();
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Not enough stock for item: ' . $rental['rentedItem']
+                ]);
+                return;
             }
+
+            $data = [
+                'full_name' => $rentername,
+                'ra_id'     => $ra_id,
+                'rent_qty'  => $qty,
+                'rent_date' => $date,
+                'due_date'  => $due_date,
+                'type'      => $type,
+            ];
+
+            $this->db->insert('tbl_renter', $data);
+
+            $this->db->set('vacant_qty', "vacant_qty - {$qty}", false);
+            $this->db->where('id', $ra_id);
+            $this->db->update('tbl_rental_asset');
+        }
+
+        $this->db->trans_complete(); // ✅ end transaction
+
+        if ($this->db->trans_status() === false) {
+            echo json_encode(['success' => false, 'message' => 'Transaction failed']);
+        } else {
+            echo json_encode(['success' => true]);
         }
     }
+
 
     public function save_issuance()
     {
@@ -313,162 +402,90 @@ class Rental_ctrl extends CI_Controller
         }
     }
 
-    // public function getTotalAmount()
-    // {
-    //     $r_id = $this->input->post('id');
-
-    //     $totalAmount = $this->Rental_mod->getTotalAmountById($r_id);
-
-    //     if ($totalAmount !== null) {
-    //         echo json_encode(['status' => 'success', 'total_amount' => $totalAmount]);
-    //     } else {
-    //         echo json_encode(['status' => 'error']);
-    //     }
-    // }
-
     public function getTotalAmount()
     {
         $id = $this->input->post('id');
 
-        $rental = $this->db->select('renter.*, rental_asset.*')
-            ->from('renter')
-            ->join('rental_asset', 'renter.ra_id = rental_asset.id', 'inner')
-            ->where('renter.r_id', $id)
-            ->get()
-            ->row(); // Fetch the result row
+        $this->db->select("
+            a.*,
+            b.*,
+            a.status as rent_status,
+            a.damage_qty as rent_damage_qty,
+            CASE
+                WHEN a.type = 'member'
+                    THEN a.rent_qty * b.mem_amt
+                ELSE
+                    a.rent_qty * b.std_amt
+            END AS total_amount
+        ");
 
-        if (!$rental) {
-            echo json_encode(['status' => 'error', 'message' => 'Rental not found.']);
-            return;
-        }
+        $this->db->from('tbl_renter as a');
+        $this->db->join('tbl_rental_asset as b','b.id = a.ra_id','left');
+        $this->db->where('a.id', $id);
+
+        $query = $this->db->get();
+        $data = $query->result_array();
 
         echo json_encode([
-            'status' => 'success',
-            'name' => $rental->r_name,
-            'item' => $rental->ra_desc,
-            'damageAmt' => $rental->ra_damage_amount,
-            'rent_qty' => $rental->r_rent_qty,
-            'total_amount' => $rental->r_amount,
-            'due_date' => $rental->r_due_date,
-            'penalty_amount' => $rental->ra_penalty_amount,
-            'rent_period' => $rental->ra_rent_period
+            "status" => 'success',
+            "data" => $data
         ]);
     }
 
     public function updateRenterStatus()
     {
-        if ($this->input->is_ajax_request()) {
-            $id = $this->input->post('id');
-            $date = $this->input->post('date');
-            $penalty = $this->input->post('penalty');
-            $totalAmount = $this->input->post('total_amount');
-            $amount = $this->input->post('amount');
-            $quantity = $this->input->post('quantity');
-            $ra_id = $this->input->post('ra_id'); // Get rental asset ID
-            $damageAmt = $this->input->post('damageAmt');
-            $damageQty = $this->input->post('damageQty');
+        $id         = $this->input->post('id');
+        $date       = $this->input->post('return_date');
+        $totalAmount = (float) $this->input->post('total_amount');
+        $quantity   = (int)   $this->input->post('quantity');
+        $ra_id      = (int)   $this->input->post('ra_id');
+        $damageAmt  = (float) $this->input->post('damageAmt');
+        $damageQty  = (int)   $this->input->post('damageQty');
 
-            // var_dump($quantity);
-            // var_dump($damageQty);
-            // exit;
+        $this->db->trans_start();
 
-            $penaltyAmt = $totalAmount - $amount;
+        $this->db->update('tbl_renter', [
+            'status'        => 'paid',
+            'date_returned' => $date,
+            'total_amt'  => $totalAmount,
+            'damage_qty'    => $damageQty,
+        ], ['id' => $id]);
 
-            // Update renter details
-            $this->db->set('r_status', 1);
-            $this->db->set('r_date_returned', $date);
-            // $this->db->set('r_rent_penalty', $penalty);
-            $this->db->set('r_rent_penalty', $penaltyAmt);
-            $this->db->set('r_total_amount', $totalAmount);
-            $this->db->set('r_damage_qty', $damageQty);
-            $this->db->set('r_damage_amount', $damageAmt);
-            $this->db->where('r_id', $id);
-            $this->db->update('renter');
+        $asset = $this->db->select('vacant_qty, damage_qty')
+                        ->from('tbl_rental_asset')
+                        ->where('id', $ra_id)
+                        ->get()
+                        ->row();
 
-            // Get current ra_vacant_qty from rental_asset
-            $this->db->select('ra_vacant_qty, ra_damage_qty');
-            $this->db->from('rental_asset');
-            $this->db->where('id', $ra_id);
-            $query = $this->db->get();
-            $result = $query->row();
+        if ($asset) {
 
-            if ($result) {
-                $finalQty = $quantity - $damageQty;
-                $newVacantQty = $result->ra_vacant_qty + $finalQty;
-                $newDamageQty = $result->ra_damage_qty + $damageQty;
-                // Update rental_asset with new quantity
-                $this->db->set('ra_vacant_qty', $newVacantQty);
-                $this->db->set('ra_damage_qty', $newDamageQty);
-                $this->db->where('id', $ra_id);
-                $this->db->update('rental_asset');
+            $finalQty      = $quantity - $damageQty;
+            $newVacantQty  = $asset->vacant_qty + $finalQty;
+            $newDamageQty  = $asset->damage_qty + $damageQty;
 
-                $this->db->set('bal', 'bal + ' . (int) $totalAmount, FALSE);
-                $this->db->set('rental_bal', 'rental_bal + ' . (int) $totalAmount, FALSE);
-                $this->db->update('fund');
-            }
+            $this->db->update('tbl_rental_asset', [
+                'vacant_qty' => $newVacantQty,
+                'damage_qty' => $newDamageQty
+            ], ['id' => $ra_id]);
 
-            echo json_encode(['status' => 'success']);
-        } else {
-            show_404();
+            $this->db->set('total_bal', 'total_bal + ' . $totalAmount, FALSE);
+            $this->db->set('rental_bal', 'rental_bal + ' . $totalAmount, FALSE);
+            $this->db->update('tbl_charge_info');
         }
+
+        $this->db->trans_complete();
+
+        echo json_encode(['status' => 'success']);
     }
+
 
     public function get_all_users()
     {
         $this->load->database();
         $query = $this->db->select("hd_id, CONCAT(fname, ' ', lname) AS full_name")
-            ->from('user_hd')
+            ->from('tbl_user_hd')
             ->get();
         echo json_encode($query->result());
     }
 
-    public function updateAsset()
-    {
-        if ($this->input->is_ajax_request()) {
-
-            $data = $this->input->post();
-            $id = $data['id'];
-            $newQty = (int) $data['eqty'];
-
-            $existing = $this->db->select('ra_qty, ra_vacant_qty')
-                ->from('rental_asset')
-                ->where('id', $id)
-                ->get()
-                ->row();
-
-            if (!$existing) {
-                echo json_encode(['success' => false, 'message' => 'Asset not found']);
-                return;
-            }
-
-            $oldQty = (int) $existing->ra_qty;
-            $vacantQty = (int) $existing->ra_vacant_qty;
-
-            $qtyDifference = $newQty - $oldQty;
-
-            $assetData = [
-                'ra_desc'           => $data['eassName'],
-                'ra_qty'            => $newQty,
-                'ra_rent_period'    => $data['erentPerd'],
-                'ra_amount'         => $data['enmemAmt'],
-                'ra_amount_member'  => $data['ememAmt'],
-                'ra_damage_amount'  => $data['edamAmt'],
-                'ra_penalty_amount' => $data['epenAmt'],
-                'ra_date_purch'     => $data['edatePurch'],
-                'ra_status'         => $data['estatus']
-            ];
-
-            $this->db->where('id', $id);
-            $this->db->set('ra_vacant_qty', 'ra_vacant_qty + ' . $qtyDifference, FALSE);
-            $update = $this->db->update('rental_asset', $assetData);
-
-            if ($update) {
-                echo json_encode(['success' => true, 'message' => 'Asset updated successfully']);
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Database update failed']);
-            }
-        } else {
-            show_error('No direct access allowed');
-        }
-    }
 }

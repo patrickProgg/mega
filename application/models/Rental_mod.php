@@ -181,12 +181,12 @@ class Rental_mod extends CI_Model
 
     public function getAvailableQty($ra_id)
     {
-        $this->db->select('ra_vacant_qty');
+        $this->db->select('vacant_qty');
         $this->db->where('id', $ra_id);
-        $query = $this->db->get('rental_asset'); // Adjust table name if needed
+        $query = $this->db->get('tbl_rental_asset'); 
 
         if ($query->num_rows() > 0) {
-            return $query->row()->ra_vacant_qty; // Return available quantity
+            return $query->row()->vacant_qty; 
         }
         return 0; // Return 0 if not found
     }

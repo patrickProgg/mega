@@ -1,14 +1,13 @@
-<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+    .modal.modal-stack {
+    z-index: 1065 !important;
+}
 
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+.modal-backdrop-stack {
+    z-index: 1060 !important;
+}
 
-
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
-
+</style>
 <section id="content">
     <!-- MAIN -->
     <main>
@@ -53,25 +52,23 @@
                 <div class="table-data">
                     <div class="order">
                         <div class="modal-content" style="border:none; background: var(--light);">
-                            <div class="modal-header" style="margin-top: 0;">
-                                <div style="font-family: Arial; font-size: 16px;" id="fam_rep"></div>
-                                <div style="font-family: Arial; font-size: 16px;" id="fund_dead_line"></div>
+                            <div class="modal-header pb-0" style="margin-top: 0;">
+                                <div> 
+                                    <label class="form-label" style="font-size: 14px;">Passed Member : <span id="fam_rep" style="font-weight: bold; font-size: 14px;"></span> </label>
+                                </div>
+                                <div> 
+                                    <label class="form-label" style="font-size: 14px;">Deadline <span id="fund_dead_line" style="font-weight: bold; font-size: 14px;"></span> </label>
+                                </div>
                             </div>
                             <div class="modal-body" id="modal-content">
                                 <div class="table-responsive">
                                     <table id="setup" class="table table-hover" style="width:100%;">
                                         <thead>
                                             <tr>
-                                                <!-- <th>ID</th> -->
                                                 <th>FULL NAME</th>
                                                 <th>AMOUNT</th>
-                                                <!-- <th style="width:100px;">Phone</th> -->
-                                                <!-- <th>Email</th> -->
                                                 <th>STATUS</th>
-                                                <!-- <th>Action</th> -->
-                                                <!-- <th style="width:100px;">Status</th> -->
                                                 <th style="width: 100px; text-align: center;">ACTION</th>
-
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -94,29 +91,23 @@
 
         <!-- pay modal -->
         <div class="modal fade" id="payMoneyModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-            <!-- <div class="modal-dialog"> -->
             <div class="modal-dialog" style="margin-top: 100px;">
-                <!-- <div class="modal-content"> -->
                 <div class="table-data">
-                    <div class="modal-content" style="box-shadow: 0px 0px 200px rgba(0, 0, 0, 0.8);">
+                        <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="payMoneyModalLabel">Pay</h5>
+                            <h5 class="modal-title" id="payMoneyModalLabel">Payment Amount</h5>
                         </div>
                         <div class="modal-body">
                             <form id="payMoneyForm">
                                 <input type="hidden" id="df_id" name="df_id">
                                 <input type="hidden" id="dd_id" name="dd_id">
                                 <div class="form-group">
-                                    <label for="amount">Enter Amount:</label>
-                                    <input type="number" class="form-control" id="amount" name="amount" value="100" required>
+                                    <input type="number" class="form-control" id="amount" name="amount" required disabled>
                                     <div class="d-flex justify-content-end mt-3">
                                         <button type="submit" class="btn btn-primary">Pay</button>
                                         <button type="button" class="btn btn-danger ms-2" data-bs-dismiss="modal">Close</button>
                                     </div>
                                 </div>
-
-                                <!-- <button type="submit" class="btn btn-primary" style="margin-top:10px;">Pay</button>
-                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" style="margin-top:10px;">Close</button> -->
                             </form>
                         </div>
                     </div>
@@ -132,15 +123,22 @@
                     <div class="order">
                         <!-- <div class="modal-content"> -->
                         <div class="modal-content" style="border:none; background: var(--light);">
-                            <div class="modal-header" style="display: flex; width: 100%;">
+                            <div class="modal-header pb-0" style="display: flex; width: 100%;">
                                 <div>
-                                    <div id="fam_reps" style="font-family: Arial; font-size: 16px; padding-bottom: 10px;"></div>
-                                    <div id="total_bal" style="font-family: Arial; font-size: 16px; "></div>
-
+                                    <div> 
+                                        <label class="form-label" style="font-size: 14px;">Passed Member : <span id="fam_reps" style="font-weight: bold; font-size: 14px;"></span> </label>
+                                    </div>
+                                    <div> 
+                                        <label class="form-label" style="font-size: 14px;">Total : ₱ <span id="total_bal" style="font-weight: bold; font-size: 14px;"></span> </label>
+                                    </div>
                                 </div>
                                 <div>
-                                    <div id="status" style="font-family: Arial; font-size: 16px; padding-bottom: 10px; padding-left: 200px; text-align: left;"></div>
-                                    <div id="remaining_bal" style="font-family: Arial; font-size: 16px;  padding-left: 200px; text-align: left;"></div>
+                                    <div> 
+                                        <label class="form-label" style="font-size: 14px;">Status : <span id="status" style="font-weight: bold; font-size: 14px;"></span> </label>
+                                    </div>
+                                    <div> 
+                                        <label class="form-label" style="font-size: 14px;">Remaining Balance : ₱ <span id="remaining_bal" style="font-weight: bold; font-size: 14px;"></span> </label>
+                                    </div>
                                 </div>
                             </div>
                             <div class="modal-body" id="modal-content">
@@ -187,7 +185,7 @@
                                         </div>
                                     </div>
                                     <div class="d-flex justify-content-end mt-3">
-                                        <button type="submit" class="btn btn-primary">Release</button>
+                                        <button id="relBtn" type="submit" class="btn btn-primary">Release</button>
                                         <button type="button" class="btn btn-danger ms-2" data-bs-dismiss="modal">Close</button>
                                     </div>
                                 </form>
@@ -220,13 +218,8 @@
             url: '<?php echo site_url('Payment_ctrl/getData'); ?>',
             type: 'POST',
             data: function(d) {
-                return {
-                    start: d.start,
-                    length: d.length,
-                    order: d.order,
-                    search: d.search.value,
-                    draw: d.draw
-                };
+                d.start = d.start || 0;
+                d.length = d.length || 10;
             },
             dataType: 'json',
             error: function(xhr, status, error) {
@@ -240,7 +233,7 @@
                 data: 'address'
             },
             {
-                data: 'dd_date_died',
+                data: 'date_died',
                 render: function(data, type, row) {
                     return formatDate(data);
                 }
@@ -250,33 +243,27 @@
             },
 
             {
-                data: 'dd_total_amt',
+                data: 'total_amt',
                 render: function(data, type, row) {
                     return `₱ ${parseFloat(data).toFixed(2)}`;
                 }
             },
             {
-                data: 'dd_amt_rcv',
+                data: 'amt_rcv',
                 render: function(data, type, row) {
                     if (parseFloat(data) === 0) {
-                        return ''; // or return 'None'; if you want to display "None"
+                        return '';
                     }
 
                     return `₱ ${parseFloat(data).toFixed(2)}`;
                 }
             },
-            // {
-            //     data: 'dd_bal',
-            //     render: function(data, type, row) {
-            //         return `₱ ${parseFloat(data).toFixed(2)}`;
-            //     }
-            // },
             {
-                data: 'dd_status',
+                data: 'status',
                 render: function(data, type, row) {
-                    if (data == 0) {
+                    if (data == 'pending') {
                         return '<span class="badge bg-danger">Pending</span>';
-                    } else if (data == 1) {
+                    } else if (data == 'partial') {
                         return '<span class="badge bg-primary">Partial</span>';
                     } else {
                         return '<span class="badge bg-success">Settled</span>';
@@ -284,48 +271,36 @@
                 }
             },
             {
-                data: 'dd_id',
+                data: 'id',
                 render: function(data, type, row) {
                     return `
-            <div style="display: flex; gap: 10px;">
-                <!-- View Icon -->
-                <i class="fas fa-eye view-icon text-primary" style="cursor: pointer; font-size: 14px;" 
-                    onclick="openDetailsModal('${row.dd_id}')"></i>
+                        <div style="display: flex; gap: 10px;">
+                            <!-- View Icon -->
+                            <i class="fas fa-eye view-icon text-primary" style="cursor: pointer; font-size: 14px;" 
+                                onclick="openDetailsModal('${row.id}', '${row.full_name}', '${row.total_amt}', '${row.status}')"></i>
 
-                <!-- Edit Icon -->
-                <i class="fas fa-file-alt text-warning" style="cursor: pointer; font-size: 14px;" 
-                    onclick="openViewModal('${row.dd_id}')"></i>
-
-                     <!-- View Icon -->
-                <i class="fas fa-paper-plane text-info" style="cursor: pointer; font-size: 14px;" 
-                    onclick="openViewModal('${row.dd_id}')"></i>
-            </div>  
-        `;
+                            <!-- Edit Icon -->
+                            <i class="fas fa-file-alt text-warning" style="cursor: pointer; font-size: 14px;" 
+                                onclick="openViewModal('${row.id}', '${row.full_name}', '${row.dead_line}')"></i>
+                        </div>  
+                    `;
                 }
             }
         ]
     });
 
-    $(document).ready(function() {
-        var setup = $('#setup').DataTable();
+    function openViewModal(id, fullname, dead_line) {
 
-        $('#setup tbody').on('click', 'tr', function() {
-            var data = setup.row(this).data();
-            if (data) {
-                var id = data.dd_id;
-                openViewModal(id);
-            }
+        let deadline = new Date(dead_line);
+        let formattedDeadline = deadline.toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric"
         });
-    });
 
-    let hdData = {}; // Global variab
+        $('#fam_rep').text(fullname);
+        $('#fund_dead_line').text(formattedDeadline);
 
-    function openViewModal(id) {
-        // let hd_id = id
-        console.log("Opening modal for ID:", id);
-        console.log("ID:", id);
-
-        // Show modal
         $('#viewModal').modal('show');
 
         // Ensure DataTable is properly re-initialized
@@ -345,43 +320,18 @@
                     type: 'POST',
                     dataType: 'json',
                     data: function(d) {
+                        d.start = d.start || 0;
+                        d.length = d.length || 10
                         d.id = id;
-                        return d;
                     },
                     error: function(xhr, status, error) {
                         console.error("AJAX request failed:", xhr.responseText);
                         Swal.fire('Error', 'Failed to load data: ' + error, 'error');
-                    },
-                    dataSrc: function(json) {
-                        // console.log("Data:", json.hd_id); 
-                        // console.log("Data:", json.data);
-
-                        let date = json.hd_id.dd_dead_line;
-                        let deadline = new Date(date);
-                        let formattedDeadline = deadline.toLocaleDateString("en-US", {
-                            month: "long",
-                            day: "numeric",
-                            year: "numeric"
-                        });
-
-                        // if (Array.isArray(json.hd_id) && json.hd_id.length > 0) {
-                        $('#fam_rep').html("Passed Member - <strong>" + json.hd_id.hd_full_name + "</strong>");
-                        $('#fund_dead_line').html("Fund Deadline - <strong>" + formattedDeadline + "</strong>");
-
-                        // } else {
-                        //     $('#fam_rep').text("Family Representative - No Data Available");
-                        // }
-
-                        return json.data; // DataTables expects an array
                     }
-
                 },
                 columns: [
-                    // {
-                    //     data: 'id'
-                    // },
                     {
-                        data: 'hd_full_name'
+                        data: 'full_name'
                     },
                     {
                         data: 'amt'
@@ -389,25 +339,29 @@
                     {
                         data: 'status',
                         render: function(data, type, row) {
-                            if (data == 1) {
+                            if (data === 'paid') {
                                 return '<span class="badge bg-success">Paid</span>';
                             } else {
-                                return '<span class="badge bg-danger">Not Paid</span>';
+                                return '<span class="badge bg-danger">Pending</span>';
                             }
                         }
                     },
                     {
                         data: 'df_id',
-                        render: function(data, type, row) {
-                            return `   
-                                <div style="display: flex; justify-content: center; align-items: center; margin-right:4px;">
-                                ${row.status != 1 ? `
-                                    <i class="fas fa-credit-card text-primary" style="cursor: pointer; font-size: 14px;" 
-                                        onclick="payMoney('${row.df_id}', '${row.dd_id}')"></i>
-                                        ` : ''}
+                        render: function (data, type, row) {
+                            return `
+                                <div class="text-center">
+                                    ${row.status != "paid" ? `
+                                        <button class="btn btn-primary btn-sm" 
+                                                style="padding: 4px 8px;font-size:10px;" 
+                                                 onclick="payMoney('${row.df_id}', '${row.dd_id}')">
+                                            <i class="fas fa-credit-card me-1"></i> Pay
+                                        </button>
+                                    ` : ''}
                                 </div>
                             `;
                         }
+
                     }
                 ],
             });
@@ -415,167 +369,165 @@
         });
     }
 
-    $(document).ready(function() {
-        var setup = $('#setup').DataTable();
-
-        $('#setup tbody').on('click', 'tr', function() {
-            var data = setup.row(this).data();
-            if (data) {
-                var id = data.dd_id;
-                openDetailsModal(id);
-            }
-        });
-    });
-
-    // let hdData = {}; // Global variab
-
-    function openDetailsModal(id) {
+    function openDetailsModal(id, fullname) {
 
         $('#openDetailsModal').modal('show');
 
-        // Ensure DataTable is properly re-initialized
-        $('#openDetailsModal').one('shown.bs.modal', function() {
-            if ($.fn.dataTable.isDataTable('#setup')) {
-                $('#details-table').DataTable().clear().destroy();
-            }
-            $('#details-table').DataTable({
-                processing: true,
-                serverSide: true,
-                paging: true,
-                pageLength: 10,
-                lengthChange: true,
-                ordering: false,
-                paging: false,
-                searching: false,
-                info: false,
-                lengthChange: false,
-                ajax: {
-                    url: '<?php echo base_url('Payment_ctrl/payment_details'); ?>',
-                    type: 'POST',
-                    dataType: 'json',
-                    data: function(d) {
-                        d.id = id;
-                        return d;
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("AJAX request failed:", xhr.responseText);
-                        Swal.fire('Error', 'Failed to load data: ' + error, 'error');
-                    },
-                    dataSrc: function(json) {
-                        console.log("HD Data:", json.data);
-                        console.log("Data:", json.hd_id);
+        if ($.fn.dataTable.isDataTable('#details-table')) {
+            $('#details-table').DataTable().clear().destroy();
+        }
+        $('#details-table').DataTable({
+            processing: true,
+            serverSide: true,
+            paging: true,
+            pageLength: 10,
+            lengthChange: true,
+            ordering: false,
+            paging: false,
+            searching: false,
+            info: false,
+            lengthChange: false,
+            ajax: {
+                url: '<?php echo base_url('Payment_ctrl/payment_details'); ?>',
+                type: 'POST',
+                dataType: 'json',
+                data: function(d) {
+                    d.id = id;
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX request failed:", xhr.responseText);
+                    Swal.fire('Error', 'Failed to load data: ' + error, 'error');
+                },
+                dataSrc: function(json) {
 
-                        // if (json.hd_id) {
+                    console.log(json);
+                    
+                    let amtRel = 0;
+                    let status = json.data[0].status;
+                    let total_bal = json.data[0].total_amt;
 
-                        let amtRel = 0;
+                    let statusText = "";
+                    let statusColorClass = "";
 
-                        if (Array.isArray(json.data) && json.data.length > 0) {
-                            amtRel = json.data.reduce((sum, item) => sum + (parseFloat(item.rf_amt_rel) || 0), 0);
+                    switch (status) {
+                        case "pending":
+                            statusText = "Pending";
+                            statusColorClass = "text-danger"; 
+                            break;
+                        case "partial":
+                            statusText = "Partial";
+                            statusColorClass = "text-primary";
+                            break;
+                        case "settled":
+                            statusText = "Settled";
+                            statusColorClass = "text-success";
+                            $('#relBtn').hide();
+                            break;
+                    }
+
+                    $('#fam_reps').text(fullname);
+                    $('#total_bal').text(total_bal);
+                    $('#status').text(statusText).removeClass('text-danger text-primary text-success').addClass(statusColorClass);
+                    $('#deceased_id').val(id);
+
+                    if (Array.isArray(json.data) && json.data.length > 0) {
+                        amtRel = json.data.reduce((sum, item) => sum + (parseFloat(item.amt_rel) || 0), 0);
+                    }
+
+                    let total = parseFloat(total_bal) || 0;
+
+                    let bal = total - amtRel;
+
+                    if (status === "settled") {
+                        document.querySelector('.releaseInputs').style.display = 'none';
+                    } else if (status === "partial") {
+                        document.querySelector('.releaseInputs').style.display = 'block';
+                        $('#type').val('full');
+                        $('#amountRelease').val(bal);
+                    } else if (status === "pending") {
+                        document.querySelector('.releaseInputs').style.display = 'block';
+                        $('#type').val('partial');
+                        $('#amountRelease').val((bal) / 2);
+                    }
+
+                    $('#remaining_bal').text((total - amtRel).toFixed(2));
+
+                    $('#type').off('change').on('change', function() {
+                        let selectedType = $(this).val();
+                        let amountField = $('#amountRelease');
+
+                        let total = parseFloat($('#total_bal').text().replace(/[^\d.]/g, '')) || 0;
+                        let bal = parseFloat($('#remaining_bal').text().replace(/[^\d.]/g, '')) || 0;
+
+                        if (selectedType === "partial") {
+                            amountField.val(((bal) / 2).toFixed(2));
+                        } else if (selectedType === "full") {
+                            amountField.val((bal).toFixed(2));
                         }
+                    });
 
-                        console.log("Total Amount Released:", amtRel);
-
-                        let total = parseFloat(json.hd_id.dd_total_amt) || 0;
-                        let id = json.hd_id.dd_id;
-
-                        let bal = total - amtRel;
-
-                        console.log("amtRel:", amtRel);
-                        console.log("total:", total);
-
-                        let status = json.hd_id.dd_status;
-
-                        let statusText = "";
-                        let statusColorClass = "";
-
-                        switch (status) {
-                            case "0":
-                                statusText = "Pending";
-                                statusColorClass = "text-danger"; // Red for pending
-                                break;
-                            case "1":
-                                statusText = "Partial";
-                                statusColorClass = "text-primary"; // Blue for partial
-                                break;
-                            case "2":
-                                statusText = "Settled";
-                                statusColorClass = "text-success"; // Green for settled
-                                break;
-                            default:
-                                statusText = "Unknown";
-                                statusColorClass = "text-secondary"; // Gray for unknown
-                        }
-
-                        if (status === "2") {
-                            document.querySelector('.releaseInputs').style.display = 'none';
-                        } else if (status === "1") {
-                            document.querySelector('.releaseInputs').style.display = 'block';
-                            $('#type').val('full');
-                            $('#amountRelease').val(bal);
-                        } else if (status === "0") {
-                            document.querySelector('.releaseInputs').style.display = 'block';
-                            $('#type').val('partial');
-                            $('#amountRelease').val((bal) / 2);
-                        }
-
-                        $('#fam_reps').html("Passed Member: <strong>" + json.hd_id.hd_full_name + "</strong>");
-                        $('#deceased_id').val(id);
-                        $('#status').html(`Status: <strong class="${statusColorClass}">${statusText}</strong>`);
-                        $('#total_bal').html("Total: <strong>₱ " + total.toFixed(2) + "</strong>");
-                        $('#remaining_bal').html("Remaining Balance: <strong>₱ " + (total - amtRel).toFixed(2) + "</strong>");
-
-                        // $('#type').val('partial');
-
-                        // if (status === "1") {
-                        //     $('#type').val('full');
-                        // }
-
-                        // $('#amountRelease').val((bal) / 2);
-
-                        $('#type').off('change').on('change', function() {
-                            let selectedType = $(this).val();
-                            let amountField = $('#amountRelease');
-
-                            let total = parseFloat($('#total_bal').text().replace(/[^\d.]/g, '')) || 0;
-                            let bal = parseFloat($('#remaining_bal').text().replace(/[^\d.]/g, '')) || 0;
-
-                            if (selectedType === "partial") {
-                                amountField.val(((bal) / 2).toFixed(2));
-                            } else if (selectedType === "full") {
-                                amountField.val((bal).toFixed(2));
-                            }
-                        });
-
-                        return json.data;
+                    return json.data;
+                }
+            },
+            columns: [{
+                    data: 'fullname'
+                },
+                {
+                    data: 'amt_rel',
+                    render: function(data) {
+                        return data ? `₱ ${parseFloat(data).toFixed(2)}` : "";
                     }
                 },
-                columns: [{
-                        data: 'rf_fullname'
-                    },
-                    {
-                        data: 'rf_amt_rel',
-                        render: function(data, type, row) {
-                            return `₱ ${parseFloat(data).toFixed(2)}`;
-                        }
-                    },
-                    {
-                        data: 'rf_date_rel',
-                        render: function(data, type, row) {
-                            return formatDate(data);
-                        }
-                    },
-                ],
-            });
-
+                {
+                    data: 'date_rel',
+                    render: function(data, type, row) {
+                        return formatDate(data);
+                    }
+                },
+            ],
         });
     }
 
     function payMoney(df_id, dd_id) {
-        $('#df_id').val(df_id); // Set df_id in modal
-        $('#dd_id').val(dd_id); // Set dd_id
-        $('#payMoneyModal').modal('show'); // Show modal
-    }
 
+        const modalEl = document.getElementById('payMoneyModal');
+
+        if (document.querySelectorAll('.modal.show').length > 0) {
+            modalEl.classList.add('modal-stack');
+
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show modal-backdrop-stack';
+            document.body.appendChild(backdrop);
+        }
+
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+
+        $.ajax({
+            url: '<?php echo base_url("Payment_ctrl/get_mort_amt"); ?>',
+            type: 'GET',
+            dataType: 'json',
+            success: function (res) {
+                if (res.status === 'success' && res.data.length > 0) {
+                    $('#amount').val(res.data[0].mort_amt);
+                }
+            },
+            error: function (err) {
+                console.log(err);
+                alert('Server error. Check console.');
+            }
+        });
+
+        $('#df_id').val(df_id);
+        $('#dd_id').val(dd_id);
+
+        modalEl.addEventListener('hidden.bs.modal', () => {
+            modalEl.classList.remove('modal-stack');
+
+            const stackedBackdrop = document.querySelector('.modal-backdrop-stack');
+            if (stackedBackdrop) stackedBackdrop.remove();
+        }, { once: true });
+    }
 
     $('#openDetailsForm').submit(function(e) {
         e.preventDefault();
@@ -586,13 +538,6 @@
         let type = $('#type').val();
         let amountRel = $('#amountRelease').val();
         let totalAmount = $('#total_bal').val();
-
-        console.log(dd_id);
-        console.log(date);
-        console.log(fullname);
-        console.log(type);
-        console.log(amountRel);
-        console.log(totalAmount);
 
         if (date.length === 0) {
             Swal.fire({
@@ -644,14 +589,14 @@
         });
     });
 
-    // Handle form submission
     $('#payMoneyForm').submit(function(e) {
         e.preventDefault();
+
+        $('#payMoneyModal').modal('hide');
 
         let df_id = $('#df_id').val();
         let dd_id = $('#dd_id').val();
         let amount = $('#amount').val();
-        console.log(df_id);
 
         Swal.fire({
             title: "Confirmation",
@@ -676,9 +621,9 @@
                     success: function(response) {
                         if (response.status === 'success') {
                             Swal.fire('Success', 'Amount updated successfully!', 'success');
-                            $('#payMoneyModal').modal('hide'); // Close modal
-                            $('#setup').DataTable().ajax.reload(); // Refresh table
-                            $('#table-data').DataTable().ajax.reload(); // Refresh table
+                            $('#payMoneyModal').modal('hide');
+                            $('#setup').DataTable().ajax.reload();
+                            $('#table-data').DataTable().ajax.reload();
                         } else {
                             Swal.fire('Error', 'Failed to update amount.', 'error');
                         }

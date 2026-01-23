@@ -588,7 +588,6 @@
 		display: flex;
 		flex-wrap: wrap;
 		grid-gap: 24px;
-		/* margin-top: 24px; */
 		margin-top: 10px;
 		width: 100%;
 		color: var(--dark);
@@ -633,7 +632,7 @@
 	}
 
 	#content main .table-data .order table th {
-		padding-bottom: 12px;
+		/* padding-bottom: 12px; */
 		font-size: 13px;
 		text-align: left;
 		padding-left: 0px;
@@ -641,23 +640,18 @@
 	}
 
 	#content main .table-data .order table td {
-		padding: 12px 0;
+		padding: 10px 0;
 		font-size: 14px;
 		;
 	}
 
 	#content main .table-data .order table tr td:first-child {
-		/* display: flex; */
-		/* align-items: center; */
-		/* grid-gap: 12px; */
 		padding-left: 10px;
 	}
 
 
 	#content main .table-data .order table tbody tr:hover {
-		/* background: var(--grey); */
 		background: var(--light-blue);
-		/* background: rgba(7, 210, 224, 0.3); */
 	}
 
 

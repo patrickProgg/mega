@@ -43,11 +43,13 @@ class Loan_ctrl extends CI_Controller
             GROUP_CONCAT(a.status ORDER BY a.loan_date SEPARATOR ",") AS statuses,
             GROUP_CONCAT(a.return_date ORDER BY a.loan_date SEPARATOR ",") AS return_dates,
             b.province,
-            b.phone1
+            b.phone1,
+            (SELECT early_interest FROM tbl_charge_info LIMIT 1) AS early_interest,
+            (SELECT late_interest FROM tbl_charge_info LIMIT 1) AS late_interest
         ');
 
         $this->db->from('tbl_loan as a');
-        $this->db->join('user_hd as b', 'b.hd_id = a.member_id', 'left');
+        $this->db->join('tbl_user_hd as b', 'b.hd_id = a.member_id', 'left');
         
         $this->db->group_by('a.member_id');
         $this->db->order_by('id', 'DESC');
@@ -93,8 +95,8 @@ class Loan_ctrl extends CI_Controller
         $amount_clean = str_replace(',', '', $amount);
         $amount_clean = (float) $amount_clean;
 
-        $this->db->set('bal', 'bal - ' . $amount_clean, FALSE);
-        $this->db->update('fund');
+        $this->db->set('total_bal', 'total_bal - ' . $amount_clean, FALSE);
+        $this->db->update('tbl_charge_info');
 
         if ($inserted) {
             echo json_encode(array('status' => 'success', 'message' => 'Loan record saved successfully.'));
@@ -111,7 +113,7 @@ class Loan_ctrl extends CI_Controller
             a.month,
             a.interest_rate,
             a.interest_amt,
-            a.payment_date,
+            a.payment_date
         ');
         $this->db->from('tbl_interest_payment as a');
         $this->db->join('tbl_loan as b', 'b.id = a.loan_id', 'left');
@@ -152,8 +154,8 @@ class Loan_ctrl extends CI_Controller
         $amount_clean = (float) $amount_clean;
 
         $this->db->set('loan_bal', 'loan_bal + ' . $amount_clean, FALSE);
-        $this->db->set('bal', 'bal + ' . $amount_clean, FALSE);
-        $this->db->update('fund');
+        $this->db->set('total_bal', 'total_bal + ' . $amount_clean, FALSE);
+        $this->db->update('tbl_charge_info');
 
         if ($inserted) {
             echo json_encode(array('status' => 'success', 'message' => 'Loan payment for ' . $month . ' saved successfully.'));
@@ -177,8 +179,8 @@ class Loan_ctrl extends CI_Controller
         $amount_clean = str_replace(',', '', $amount);
         $amount_clean = (float) $amount_clean;
 
-        $this->db->set('bal', 'bal + ' . $amount_clean, FALSE);
-        $this->db->update('fund');
+        $this->db->set('total_bal', 'total_bal + ' . $amount_clean, FALSE);
+        $this->db->update('tbl_charge_info');
 
         if ($updated) {
             echo json_encode(array('status' => 'success', 'message' => 'Principal amount returned successfully.'));
@@ -186,4 +188,17 @@ class Loan_ctrl extends CI_Controller
             echo json_encode(array('status' => 'error', 'message' => 'Failed to return principal amount.'));
         }
     }
+
+    public function get_last_payment() {
+        $id = $this->input->post('id');
+
+        $this->db->select('MAX(payment_date) as payment_date');
+        $this->db->from('tbl_interest_payment');
+        $this->db->where('loan_id', $id);
+
+        $query = $this->db->get();
+
+        echo json_encode($query->row_array());
+    }
+
 }

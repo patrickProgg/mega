@@ -30,8 +30,6 @@ class User_ctrl extends CI_Controller
         $start = $this->input->post('start');
         $length = $this->input->post('length');
         $searchValue = trim($this->input->post('search')['value']);
-        $status = $this->input->post('status');
-        $address = $this->input->post('address');
 
         $this->db->select("
             hd_id,
@@ -53,7 +51,7 @@ class User_ctrl extends CI_Controller
             CONCAT_WS(', ', purok, barangay, city, province) AS address
         ");
 
-        $this->db->from('user_hd');
+        $this->db->from('tbl_user_hd');
 
         $this->db->order_by('hd_id', 'DESC');
 
@@ -104,7 +102,7 @@ class User_ctrl extends CI_Controller
             CONCAT_WS(', ', purok, barangay, city, province) AS address
         ");
 
-        $this->db->from('user_ln');
+        $this->db->from('tbl_user_ln');
         $this->db->where('hd_id', $id);
 
         $this->db->order_by('ln_id', 'DESC');
@@ -197,39 +195,45 @@ class User_ctrl extends CI_Controller
             $user_id = $this->input->post('user_id');
             $date_died = $this->input->post('date_died');
 
-            $user = $this->db->get_where('user_hd', ['hd_id' => $user_id])->row();
+            $user = $this->db->get_where('tbl_user_hd', ['hd_id' => $user_id])->row();
 
             if (!$user) {
                 echo json_encode(['status' => 'error']);
                 return;
             }
 
+            $this->db->select('mort_amt');
+            $this->db->from('tbl_charge_info');
+            $mortAmtObj = $this->db->get()->row();
+
+            $mortAmt = $mortAmtObj->mort_amt;
+
             $this->db->select('hd_id');
-            $this->db->from('user_hd');
+            $this->db->from('tbl_user_hd');
             $this->db->where('hd_id !=', $user_id); 
             $allUsers = $this->db->get()->result();
 
             $totalUsers = count($allUsers);
-            $total_amount = $totalUsers * 100;
+            $total_amount = $totalUsers * $mortAmt;
 
             $deadline = date('Y-m-d', strtotime($date_died . ' +3 days'));
 
             $data = [
                 'hd_id' => $user->hd_id,
-                'dd_date_died' => $date_died,
-                'dd_total_amt' => $total_amount,
-                'dd_dead_line' => $deadline
+                'date_died' => $date_died,
+                'total_amt' => $total_amount,
+                'dead_line' => $deadline
             ];
 
-            $this->db->insert('deceased', $data);
+            $this->db->insert('tbl_deceased', $data);
             $dd_id = $this->db->insert_id(); 
 
             $this->db->where('hd_id', $user_id);
-            $this->db->update('user_hd', ['status' => 2]);
+            $this->db->update('tbl_user_hd', ['status' => 'deceased']);
 
             $insertData = [];
             foreach ($allUsers as $u) {
-                $exists = $this->db->get_where('death_fund', [
+                $exists = $this->db->get_where('tbl_death_fund', [
                     'dd_id' => $dd_id,
                     'hd_id' => $u->hd_id
                 ])->row();
@@ -245,7 +249,7 @@ class User_ctrl extends CI_Controller
             }
 
             if (!empty($insertData)) {
-                $this->db->insert_batch('death_fund', $insertData);
+                $this->db->insert_batch('tbl_death_fund', $insertData);
             }
 
             echo json_encode(['status' => 'success']);
@@ -271,11 +275,10 @@ class User_ctrl extends CI_Controller
                 'city'      => $data['city'],
                 'province'      => $data['province'],
                 'zip_code'      => $data['zip_code'],
-                'status'    => 1,
                 'date_joined'    => $data['date_joined'],
             ];
 
-            $insert = $this->db->insert('user_hd', $memberData);
+            $insert = $this->db->insert('tbl_user_hd', $memberData);
 
             if ($insert) {
                 echo json_encode(['success' => true, 'message' => 'Member added successfully']);
@@ -308,7 +311,7 @@ class User_ctrl extends CI_Controller
             );
 
             $this->db->where('hd_id', $id);
-            $update = $this->db->update('user_hd', $data);
+            $update = $this->db->update('tbl_user_hd', $data);
 
             if ($update) {
                 echo json_encode(['success' => true, 'message' => 'Member updated successfully']);
@@ -344,7 +347,7 @@ class User_ctrl extends CI_Controller
                 'date_joined'    => $data['date_joined'],
             ];
 
-            $insert = $this->db->insert('user_ln', $memberData);
+            $insert = $this->db->insert('tbl_user_ln', $memberData);
 
             if ($insert) {
                 echo json_encode(['success' => true, 'message' => 'Member added successfully']);
@@ -377,7 +380,7 @@ class User_ctrl extends CI_Controller
             );
 
             $this->db->where('ln_id', $id);
-            $update = $this->db->update('user_ln', $data);
+            $update = $this->db->update('tbl_user_ln', $data);
 
             if ($update) {
                 echo json_encode(['success' => true, 'message' => 'Member updated successfully']);

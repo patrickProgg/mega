@@ -217,13 +217,11 @@
                 render: function(data, type, row) {
                     return `
                         <div style="text-center">
-                            ${row.r_status != 1 ? `
-                                <button class="btn btn-primary btn-sm" 
-                                        style="padding: 2px 6px; font-size: 12px;" 
-                                        onclick="viewLoanDetails('${row.loan_ids}', '${row.full_name}','${row.statuses}' ,'${row.loan_dates}', '${row.loan_amts}', '${row.return_dates}')">
-                                    <i class="fas fa-eye" style="font-size: 12px;"></i> View
-                                </button>
-                            ` : ''}
+                            <button class="btn btn-primary btn-sm" 
+                                    style="padding: 2px 6px; font-size: 12px;" 
+                                    onclick="viewLoanDetails('${row.loan_ids}', '${row.full_name}','${row.statuses}' ,'${row.loan_dates}', '${row.loan_amts}', '${row.return_dates}', '${row.early_interest}', '${row.late_interest}')">
+                                <i class="fas fa-eye" style="font-size: 12px;"></i> View
+                            </button>
                         </div>
                     `;
                 }               
@@ -296,7 +294,7 @@
         });
     });
 
-    function viewLoanDetails(id, fullname, status, loan_date, loan_amt, return_date) {
+    function viewLoanDetails(id, fullname, status, loan_date, loan_amt, return_date, early, late) {
 
         const amount = Number(loan_amt).toLocaleString('en-PH', {
             minimumFractionDigits: 2,
@@ -349,7 +347,7 @@
 
         $('#header_id').val(selectedId);
 
-        populateLoanTable(selectedId, selectedDate, selectedAmt, selectedStatus, selectedReturn);
+        populateLoanTable(selectedId, selectedDate, selectedAmt, selectedStatus, selectedReturn, early, late);
 
         $('#header_date_arr').off('change').on('change', function () {
             const selected = $(this).find(':selected');
@@ -376,13 +374,13 @@
             );
             $('#header_id').val(selectedId);
 
-            populateLoanTable(selectedId, selectedDate, selectedAmt, selectedStatus, selectedReturn);
+            populateLoanTable(selectedId, selectedDate, selectedAmt, selectedStatus, selectedReturn, early, late);
         });
 
         $('#showLoanModal').modal('show');
     }
 
-    function populateLoanTable(id, selectedDate, selectedAmt, selectedStatus, selectedReturn) {
+    function populateLoanTable(id, selectedDate, selectedAmt, selectedStatus, selectedReturn, early, late) {
 
         $.ajax({
             url: "<?php echo base_url('Loan_ctrl/get_loan_details'); ?>",
@@ -415,12 +413,24 @@
                     if (!isNaN(tempMonth)) endMonth = tempMonth;
                 }
 
+                let allPaid = true;
+
+                let firstUnpaidMonth = null;
+
                 for (let m = startMonth; m <= endMonth; m++) {
 
                     const loan = loanDetails.find(l => parseInt(l.month) === (m + 1));
 
+                    if (!loan) {
+                        allPaid = false;
+                        if (firstUnpaidMonth === null) {
+                            firstUnpaidMonth = m + 1;
+                        }
+                    }
+
                     const interestRate = loan?.interest_rate ?? '-';
                     const interestAmtValue = loan ? parseFloat(loan.interest_amt) : 0;
+                    totalInterest += interestAmtValue;
                     const interestAmt = loan
                         ? interestAmtValue.toLocaleString('en-PH', { minimumFractionDigits: 2 })
                         : '-';
@@ -435,26 +445,29 @@
                                 <i class="fa fa-check-circle"></i> Paid
                             </span>`;
                     } else {
+                        const disabled = (firstUnpaidMonth !== null && (m + 1) !== firstUnpaidMonth);
+
                         action = `
                             <button class="btn btn-primary btn-sm pay-btn"
                                 data-month="${m + 1}"
                                 data-id="${id}"
+                                data-early_int="${early}"
+                                data-late_int="${late}"
                                 data-amount="${amount}"
-                                style="padding:4px 8px;font-size:10px;">
+                                style="padding:4px 8px;font-size:10px;"
+                                ${disabled ? 'disabled' : ''}>
                                 <i class="fa fa-credit-card me-1"></i> Pay
                             </button>`;
                     }
 
-                    totalInterest += interestAmtValue;
-
                     tableBody.append(`
-                    <tr>
-                        <td style="padding: 5px 6px;">${monthNames[m]}</td>
-                        <td style="padding: 5px 6px;">${interestRate}</td>
-                        <td style="padding: 5px 6px;">${interestAmt}</td>
-                        <td style="padding: 5px 6px;">${formatDate(paymentDate) || '-'}</td>
-                        <td style="padding: 5px 6px;">${action}</td>
-                    </tr>
+                        <tr>
+                            <td style="padding: 5px 6px;">${monthNames[m]}</td>
+                            <td style="padding: 5px 6px;">${interestRate}</td>
+                            <td style="padding: 5px 6px;">${interestAmt}</td>
+                            <td style="padding: 5px 6px;">${formatDate(paymentDate) || '-'}</td>
+                            <td style="padding: 5px 6px;">${action}</td>
+                        </tr>
                     `);
                 }
 
@@ -470,7 +483,8 @@
 
                 const returnBtn = $('#returnBtn');
 
-                if (loanDetails.length <= 0 || status ==="completed") {
+                console.log(allPaid);
+                if (loanDetails.length <= 0 || status ==="completed" || allPaid) {
                     returnBtn.hide();
                 } else {
                     returnBtn.show();
@@ -487,6 +501,8 @@
         const month = $(this).data('month'); 
         const id = $(this).data('id');
         const amount = $(this).data('amount');
+        const early_int = $(this).data('early_int');
+        const late_int = $(this).data('late_int');
 
         const defaultDate = new Date(new Date().getFullYear(), 0);
         defaultDate.setMonth(month);
@@ -511,7 +527,7 @@
                 }
 
                 const selectedMonth = new Date(selectedDate).getMonth() + 1;
-                const interestRate = selectedMonth > month ? 0.10 : 0.05;
+                const interestRate = selectedMonth > month ? late_int : early_int;
                 const interestAmount = amount * interestRate;
 
                 $.ajax({
@@ -541,6 +557,9 @@
 
                         $('#returnBtn').show();
 
+                        const nextMonth = month + 1;
+                            $(`.pay-btn[data-id="${id}"][data-month="${nextMonth}"]`).prop('disabled', false);
+
                     },
                     error: function() {
                         Swal.fire('Error', 'Something went wrong.', 'error');
@@ -554,35 +573,62 @@
         const id = $('#header_id').val();
         const amount = $('#header_amount').text();
 
-        console.log(id);
+        $.ajax({
+            url: "<?php echo base_url('Loan_ctrl/get_last_payment'); ?>",
+            type: "POST",
+            dataType: "json",
+            data: { id: id },
+            success: function(response) {
+                let lastPayment = response.payment_date;
+                
+                let lastDate = lastPayment ? new Date(lastPayment) : null;
+                let now = new Date();
 
-        Swal.fire({
-            title: 'Confirm Return',
-            text: 'Are you sure you want to return the ₱' + amount + ' principal amount?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, Return'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: "<?php echo base_url('Loan_ctrl/return_principal'); ?>",
-                    type: "POST",
-                    data: {
-                        id: id,
-                        amount: amount
-                    },
-                    success: function(response) {
-                        Swal.fire('Returned!', response.message, 'success');
-                        $('#showLoanModal').modal('hide');
-                        $('#loaner-table').DataTable().ajax.reload(); 
-                    },
-                    error: function() {
-                        Swal.fire('Error', response.message, 'error');
+                let sameMonth = lastDate &&
+                                lastDate.getMonth() === now.getMonth() &&
+                                lastDate.getFullYear() === now.getFullYear();
+
+                // if (!sameMonth) {
+                //     Swal.fire({
+                //         icon: 'warning',
+                //         title: 'Unpaid Interest',
+                //         text: 'There is unpaid interest from previous months. Please pay it first.'
+                //     });
+                //     return; // stop further execution
+                // }
+
+                Swal.fire({
+                    title: 'Confirm Return',
+                    html: `Are you sure you want to return the ₱${amount} principal amount?<br><br>
+                        <strong>Last Payment Date:</strong> ${lastPayment}`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Return'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "<?php echo base_url('Loan_ctrl/return_principal'); ?>",
+                            type: "POST",
+                            data: { 
+                                id: id, 
+                                amount: amount,
+                            },
+                            success: function(response) {
+                                Swal.fire('Returned!', response.message, 'success');
+                                $('#showLoanModal').modal('hide');
+                                $('#loaner-table').DataTable().ajax.reload();
+                            },
+                            error: function() {
+                                Swal.fire('Error', 'Something went wrong.', 'error');
+                            }
+                        });
                     }
                 });
+            },
+            error: function() {
+                Swal.fire('Error', 'Something went wrong.', 'error');
             }
         });
-
     });
 
     $(document).ready(function() {
